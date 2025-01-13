@@ -1,0 +1,35 @@
+{
+  "name": "@avleon/cli",
+  "version": "0.0.4",
+  "bin": {
+    "av": "./dist/cli.js"
+  },
+  "description": "",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "clean": "rm -rf ./dist",
+    "watch": "tsc-watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^22.9.3",
+    "cli-table3": "^0.6.5",
+    "nodemon": "^3.1.7",
+    "prettier": "^3.3.3",
+    "tsc-watch": "^6.2.1",
+    "typescript": "^5.7.2"
+  },
+  "dependencies": {
+    "chalk": "^4",
+    "fs-extra": "^11.2.0"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
+  }
+}
