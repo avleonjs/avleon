@@ -70,7 +70,6 @@ main().catch(err=> console.log(err));
   "devDependencies": {
     "nodemon": "^3.1.7",
     "ts-node": "^10.9.2",
-    "tsc-watch": "^6.2.1",
     "typescript": "^5.7.2"
   }
 
