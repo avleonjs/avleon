@@ -16,7 +16,7 @@ const listedCommands = commandList.flatMap(x => x.Command).concat(commandList.fl
 
 /**
  * @description Displaying basic info
- * @since v0.0.1
+ * @since v0.0.2
  * */
 async function printLogo() {
   try {
@@ -25,7 +25,7 @@ async function printLogo() {
       "utf8",
     );
     const parsedPackInfo = JSON.parse(packageInfo);
-    console.log(`Name: Iqra CLI`, "\r");
+    console.log(`Name: Avleon CLI`, "\r");
     console.log(`Version: ${parsedPackInfo.version}`, "\r");
   } catch (error) {
     throw new Error("Can't read packag info");
