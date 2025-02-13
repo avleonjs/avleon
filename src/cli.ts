@@ -237,6 +237,4 @@ export async function run() {
     console.log("CLI ERROR:", error);
   }
 }
-
-
 run()
