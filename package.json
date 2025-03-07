@@ -29,7 +29,8 @@
     "chalk": "^4",
     "fs-extra": "^11.2.0"
   },
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com/"
-  }
+    "repository": {
+      "type": "git",
+      "url": "git+https://github.com/avleonjs/avleon-cli"
+    }
 }
