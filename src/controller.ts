@@ -16,7 +16,6 @@ async function createController(
     );
   }
   const controllerPath = path.join(process.cwd(), "./src/controllers");
-
   const controllerFolderExists = existsSync(controllerPath);
   if (!controllerFolderExists) {
     await mkdir(controllerPath, {
@@ -50,9 +49,7 @@ async function createController(
   const restController = `
   import { ApiController, Get, Post, Put, Delete, Param, Body } from '@avleon/core';
   \t
-    @ApiController("/${controllerNameLowerCase}", { 
-      name: "${controllerNameCap}" 
-    })
+    @ApiController("/${controllerNameLowerCase}")
     export class ${controllerName}{\n
   @Get()
   async findAll(){
@@ -84,7 +81,7 @@ async function createController(
   export class ${controllerName}{
   \n
   @Get()
-  async index(){
+  index(){
   return []
   }
   }
