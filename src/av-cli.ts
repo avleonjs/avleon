@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import { AvCli, CreateModelOptions } from "./cli.interface";
 import { commandList, CommandType } from "./commands";
 
@@ -92,34 +93,3 @@ export function PathExtractor(givenPath: string, options: string[]) {
   return {};
 }
 
-export class Cli implements AvCli {
-  commands: CommandType[] = commandList;
-  private isBusy = false;
-  private constructor() {}
-
-  createApplication(): void {}
-  createModel(options: CreateModelOptions): void {
-    throw new Error("Method not implemented.");
-  }
-  createService(): void {
-    throw new Error("Method not implemented.");
-  }
-  createController(): void {
-    throw new Error("Method not implemented.");
-  }
-  createProject(): void {
-    throw new Error("Method not implemented.");
-  }
-  createResource(): void {
-    throw new Error("Method not implemented.");
-  }
-  createRestService(): void {
-    throw new Error("Method not implemented.");
-  }
-  createRestController(): void {
-    throw new Error("Method not implemented.");
-  }
-  displayHelp(): void {
-    throw new Error("Method not implemented.");
-  }
-}

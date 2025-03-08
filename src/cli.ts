@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import Table, { HorizontalTableRow } from "cli-table3";
 import path from "path";
 import fs from "fs/promises";

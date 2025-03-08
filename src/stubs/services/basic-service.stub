@@ -1,0 +1,8 @@
+
+@AppService
+export class {Service} {
+  
+  sayHello(){
+    return "Hello World!";
+  }
+}

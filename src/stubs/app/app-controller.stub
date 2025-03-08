@@ -1,0 +1,11 @@
+import { Builder, AppConfig } from '@avleon/core';
+import { HomeController } from './controllers/home.controller';
+
+const builder = Builder.createAppBuilder();
+
+const app = builder.build();
+app.useOpenApi((config:AppConfig)=> config.openApi);
+app.useControllers([HomeController]);
+
+
+app.run();

@@ -19,20 +19,45 @@ async function createApplication(fname: any) {
   // copy 
   //
   const mainFunc = `
-import 'reflect-metadata';
-import { AppBuilder } from '@avleon/core';
+import {
+  Builder,
+  env
+} from "@avleon/core";
 
-async function main() {
-  const builder = AppBuilder.createBuilder();
-//  builder.useLogger();
-  builder.useDatabase();
 
-  const app = await builder.build();
-  await app.mapControllers();
-  await app.run();
+// create builder
+const builder = Builder.createAppBuilder();
 
-}
-main().catch(err=> console.log(err));
+// registering all services and dependencies here
+// builder.addDataSource({
+//   type: "better-sqlite3",
+//   database: path.join(process.cwd(), "mydb.db"),
+//   entities: [Category, Product],
+//   synchronize: true,
+// });
+
+// build app
+const app = builder.build();
+
+app.useSwagger({
+  info: {
+    title: "${fname}",
+    description: "Your description here",
+    version: "0.0.1",
+  },
+  servers: [
+    {
+      url: "http://localhost:"+env.PORT,
+      description: "Development",
+    },
+
+});
+
+
+app.mapGet('/', ()=> "Welcome");
+
+app.listen(env.PORT);
+
 `
 
   const formatMainFunc = await prettier.format(
@@ -54,7 +79,6 @@ main().catch(err=> console.log(err));
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \\"Error: no test specified\\" && exit 1",
     "dev": "nodemon src/app.ts",
     "start": "node dist/app.js",
     "build": "rimraf dist && tsc"
@@ -88,8 +112,9 @@ main().catch(err=> console.log(err));
     "target": "ES2017",
     "module": "CommonJS",
     "moduleResolution": "node",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "outDir": "./dist",
-    "rootDir": "./src",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
@@ -105,7 +130,10 @@ main().catch(err=> console.log(err));
 
 
   console.info("Running pnpm install");
-  execSync(`cd ${fname}&& pnpm install && pnpm link @avleon/core && pnpm link @avleon/data`, { stdio: 'inherit' })
+
+  console.log(`cd ${fname}&& pnpm install`);
+
+  //execSync(`cd ${fname}&& pnpm install && pnpm add @avleon/core`, { stdio: 'inherit' })
 
   console.info("App create successfully.");
 

@@ -11,9 +11,15 @@ importers:
       chalk:
         specifier: ^4
         version: 4.1.2
+      cli-table3:
+        specifier: ^0.6.5
+        version: 0.6.5
       fs-extra:
         specifier: ^11.2.0
         version: 11.3.0
+      prettier:
+        specifier: ^3.3.3
+        version: 3.4.2
     devDependencies:
       '@types/fs-extra':
         specifier: ^11.0.4
@@ -21,15 +27,9 @@ importers:
       '@types/node':
         specifier: ^22.9.3
         version: 22.13.0
-      cli-table3:
-        specifier: ^0.6.5
-        version: 0.6.5
       nodemon:
         specifier: ^3.1.7
         version: 3.1.9
-      prettier:
-        specifier: ^3.3.3
-        version: 3.4.2
       tsc-watch:
         specifier: ^6.2.1
         version: 6.2.1(typescript@5.7.3)

@@ -1,0 +1,32 @@
+import { ApiController, Get, Post, Update, Delete, Param, Body, HttpResponse } from '@avleon/core';
+
+
+@ApiController('/{controllers}')
+export class {Controller}{
+
+  @Get()
+  index(){
+    return HttpResponse.Ok("{Controller}");
+  }
+
+  @Get('/:id')
+  findOne(@Param('id') id:{pktype}){
+    return HttpResponse.Ok(`Item found with id:${id}`);
+  }
+
+  @Post()
+  create(@Body() body:{bodyType}){
+    return HttpResponse.Ok("Created");
+  }
+
+  @Update('/:id')
+  update(@Param('id') id:{pktype}, updateBody:{updateBodyType}){
+    return HttpResponse.Ok(`Item updated with id:${id}`)
+  }
+
+  @Delete('/:id')
+  delete(@Param('id') id:{pktype}){
+    return HttpResponse.Ok(`Item delted with id:${id}`)
+  }
+
+}
