@@ -1,8 +1,8 @@
 #!/usr/bin/env node
-import Table, { HorizontalTableRow } from "cli-table3";
+import Table from "cli-table3";
 import path from "path";
 import fs from "fs/promises";
-import fsExtra from 'fs-extra';
+import fsExtra from "fs-extra";
 import { existsSync } from "fs";
 import * as prettier from "prettier";
 import chalk from "chalk";
@@ -13,7 +13,11 @@ import { createApplication } from "./create";
 
 export function iqraCli() { }
 
-const listedCommands = commandList.flatMap(x => x.Command).concat(commandList.flatMap(x => x.Alias.split(","))).flatMap(a => a.trim());
+const listedCommands = commandList
+  .flatMap((x) => x.Command)
+  .concat(commandList.flatMap((x) => x.Alias.split(",")))
+  .flatMap((a) => a.trim())
+  .concat("build");
 
 /**
  * @description Displaying basic info
@@ -62,7 +66,6 @@ async function displayCommandList(info = { logo: true, all: false }) {
     });
     console.log(table.toString());
   }
-
 }
 
 async function createModel(name: string, options = { force: false }) {
@@ -130,14 +133,14 @@ async function createXApplication(fname: string) {
     throw new Error("Application already exists");
   }
 
-
   const projectPath = path.join(process.cwd(), fname);
-  const templateDir = path.resolve("D:\\projects\\node\\iqra\\packages\\cli\\src\\stubs");
+  const templateDir = path.resolve(
+    "D:\\projects\\node\\iqra\\packages\\cli\\src\\stubs",
+  );
 
   //await fs.mkdir(projectPath);
 
-  //await fsExtra.copy(templateDir, projectPath + '/'); 
-
+  //await fsExtra.copy(templateDir, projectPath + '/');
 
   // Define project path
   // const projectPath = path.resolve('new_test');
@@ -155,7 +158,7 @@ cd ..
 
   try {
     // Execute the cloning and moving process
-    console.log('Cloning and setting up the repository...');
+    console.log("Cloning and setting up the repository...");
     exec(cloneCommand, {});
 
     // Check if the projectPath exists before proceeding
@@ -164,28 +167,29 @@ cd ..
     }
 
     // Remove the Git origin from the new project
-    console.log('Removing Git origin...');
-    execSync(`cd ${projectPath} && git remote remove origin`, { stdio: 'inherit' });
+    console.log("Removing Git origin...");
+    execSync(`cd ${projectPath} && git remote remove origin`, {
+      stdio: "inherit",
+    });
 
     // Clean up the temporary repository
-    console.log('Cleaning up temporary files...');
-    fsExtra.removeSync('./temp_repo');
+    console.log("Cleaning up temporary files...");
+    fsExtra.removeSync("./temp_repo");
 
     console.log(`Project created successfully in ${projectPath}`);
   } catch (error) {
-    console.error('An error occurred:', error);
+    console.error("An error occurred:", error);
 
     // Cleanup in case of failure
-    if (fsExtra.existsSync('./temp_repo')) {
-      console.log('Cleaning up temporary repository...');
-      fsExtra.removeSync('./temp_repo');
+    if (fsExtra.existsSync("./temp_repo")) {
+      console.log("Cleaning up temporary repository...");
+      fsExtra.removeSync("./temp_repo");
     }
     if (fsExtra.existsSync(projectPath)) {
-      console.log('Cleaning up project path...');
+      console.log("Cleaning up project path...");
       fsExtra.removeSync(projectPath);
     }
   }
-
 }
 
 export async function run() {
@@ -197,7 +201,9 @@ export async function run() {
       const cmdList = commandList
         .flatMap((x) => x.Command)
         .concat(
-          ...commandList.flatMap((f) => f.Alias.split(",").map((s) => s.trim())),
+          ...commandList.flatMap((f) =>
+            f.Alias.split(",").map((s) => s.trim()),
+          ),
         );
       if (!listedCommands.includes(args[0].trim())) {
         console.error("Invalid command");
@@ -210,6 +216,13 @@ export async function run() {
         if (args[0] == "new") {
           const fname = args[1];
           await createApplication(fname);
+        }
+        if (args[0] == "build") {
+          process.env.NODE_ENV = "production";
+          //const appPath =
+          execSync("npx rimraf ./dist");
+          execSync("npx tsc --project tsconfig.build.json");
+          console.log("Build successfully");
         }
         if (args[0] == "make:model") {
           await createModel(args[1], { force });
@@ -238,4 +251,4 @@ export async function run() {
     console.log("CLI ERROR:", error);
   }
 }
-run()
+run();

@@ -49,7 +49,8 @@ app.useSwagger({
     {
       url: "http://localhost:"+env.PORT,
       description: "Development",
-    },
+    }
+ ]
 
 });
 

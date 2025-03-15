@@ -1,6 +1,6 @@
 {
   "name": "@avleon/cli",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "bin": {
     "avleon": "./dist/cli.js"
   },
@@ -12,7 +12,10 @@
     "clean": "rm -rf ./dist",
     "watch": "tsc-watch"
   },
-  "keywords": ["cli","backend-api"],
+  "keywords": [
+    "cli",
+    "backend-api"
+  ],
   "author": "Tareq Hossain",
   "license": "ISC",
   "devDependencies": {
