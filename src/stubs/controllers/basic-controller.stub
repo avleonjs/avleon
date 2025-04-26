@@ -1,7 +1,7 @@
 import { ApiController, Get, HttpResponse } from '@avleon/core';
 
 
-@ApiController('/{controller}')
+@ApiController('/{controller}s')
 export class {Controller}{
 
   @Get()

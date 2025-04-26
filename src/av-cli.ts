@@ -23,6 +23,31 @@ interface FilePathExtractor {
   fileType?: ProjectFileType;
 }
 
+interface MakeOptions {
+  name?: string;
+  force?: boolean;
+  crud?: boolean;
+  model?: boolean;
+  tests?: boolean;
+}
+
+interface RestOptions {}
+
+type FieldOptions = "";
+interface MakeModel {
+  name?: string;
+  force?: boolean;
+  fields?: FieldOptions;
+  tiemstamps?: boolean;
+  entity?: boolean;
+}
+
+interface MakeService extends MakeOptions {
+  dtos?: boolean;
+}
+
+interface MakeController extends MakeOptions {}
+
 function formatFileName(name: string) {
   return name
     .replace(/[_\s]+/g, "-")
@@ -92,4 +117,3 @@ export function PathExtractor(givenPath: string, options: string[]) {
 
   return {};
 }
-

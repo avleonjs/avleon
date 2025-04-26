@@ -4,7 +4,10 @@ import { mkdir, readFile, writeFile } from "fs/promises";
 import path from "path";
 import prettier from "prettier";
 
-
+function capitalize(str:string) {
+    if (!str) return '';
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+}
 async function createController(
   name: string,
   options = { force: false, resource: false, model: null },
@@ -24,7 +27,12 @@ async function createController(
   }
 
   const controllerName = name.at(0).toUpperCase() + name.slice(1);
-  const controllerNameLowerCase = name.replace(/Controller/ig, '').match(/[A-Z][a-z]+|[0-9]+/g).join("-").toLowerCase();
+const controllerNameLowerCase = name
+    .replace(/Controller/ig, '')
+    .match(/[A-Z]?[a-z]+|[0-9]+/g) // added ? to also capture single lowercase words
+    ?.join('-')
+    .toLowerCase() || name.toLowerCase();
+
   const controllerNameCap = controllerName.replace(/Controller/ig, '')
   const controllerExists = existsSync(`${controllerPath}/${name.toLowerCase()}.controller.ts`);
 
@@ -36,21 +44,35 @@ async function createController(
     return;
   }
 
-  if (options.model) {
-    const file = await import(
-      path.join(process.cwd(), "./src/models/" + options.model.toUpperCase() + ".ts")
+  if(options.resource && !options.model)
+  {
+    console.log(
+      chalk.bold(chalk.red("Model must be provide to generate rest controller!")),
+      chalk.greenBright("Use -m Model or --model Model to .\r"),
     );
+    return;
+}
+  // if (options.model) {
+  //   const file = require(
+  //     path.join(process.cwd(), "./src/models/" + options.model.toUpperCase() + ".ts")
+  //   ).default;
 
-    if (file) {
-      Object.getOwnPropertyNames(file);
-    }
-  }
+  //   if (file) {
+  //     Object.getOwnPropertyNames(file);
+  //   }
+  // }
 
   const restController = `
-  import { ApiController, Get, Post, Put, Delete, Param, Body } from '@avleon/core';
+  import { ApiController, Collection, Get, Post, Put, Delete, Param, Body } from '@avleon/core';
+  import { ${capitalize(options.model)} } from '../models/${capitalize(options.model)}'
   \t
-    @ApiController("/${controllerNameLowerCase}")
-    export class ${controllerName}{\n
+    @ApiController("/${controllerNameLowerCase}s")
+    export class ${controllerName}Controller {\n
+
+    constructor(
+      private readonly ${options.model.toLowerCase()}Repository = Collection.fromRepository(${capitalize(options.model)})
+    ){}
+
   @Get()
   async findAll(){
     return "okay";
@@ -97,7 +119,7 @@ async function createController(
   );
 
   await writeFile(
-    path.join(process.cwd(), "./src/controllers/" + controllerName.toLowerCase().replace("controller", "") + ".controller." + ".ts"),
+    path.join(process.cwd(), "./src/controllers/" + controllerName.toLowerCase().replace("controller", "") + ".controller" + ".ts"),
     formatcontroller,
   );
 

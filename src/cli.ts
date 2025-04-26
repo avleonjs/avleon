@@ -5,13 +5,12 @@ import fs from "fs/promises";
 import fsExtra from "fs-extra";
 import { existsSync } from "fs";
 import * as prettier from "prettier";
-import chalk from "chalk";
 import { createController } from "./controller";
 import { commandList } from "./commands";
 import { exec, execSync } from "child_process";
 import { createApplication } from "./create";
 
-export function iqraCli() { }
+export function iqraCli() {}
 
 const listedCommands = commandList
   .flatMap((x) => x.Command)
@@ -90,10 +89,7 @@ async function createModel(name: string, options = { force: false }) {
   );
 
   if (modelExists && !options.force) {
-    console.log(
-      chalk.bold(chalk.red("Model already exists!")),
-      chalk.greenBright("Use -f or --force to overwrite.\r"),
-    );
+    console.log("Model already exists!", "Use -f or --force to overwrite.\r");
     return;
   }
 
@@ -220,7 +216,7 @@ export async function run() {
         if (args[0] == "build") {
           process.env.NODE_ENV = "production";
           //const appPath =
-          execSync("npx rimraf ./dist");
+          execSync("rm -r ./dist");
           execSync("npx tsc --project tsconfig.build.json");
           console.log("Build successfully");
         }

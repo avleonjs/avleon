@@ -1,14 +1,10 @@
-
-import fs from 'fs-extra';
-import { appPaths as getAppPaths } from './paths';
-import * as prettier from 'prettier';
-import path from 'path/win32';
-import { execSync } from 'child_process';
-
-
+import fs from "fs-extra";
+import { appPaths as getAppPaths } from "./paths";
+import * as prettier from "prettier";
+import path from "path/win32";
+import { execSync } from "child_process";
 
 async function createApplication(fname: any) {
-
   const appPaths = getAppPaths(fname);
   const dirs = Object.values(appPaths);
   for (let i = 0; i < dirs.length; i++) {
@@ -16,78 +12,52 @@ async function createApplication(fname: any) {
   }
 
   await fs.ensureDir(appPaths.root + "/public");
-  // copy 
+  // copy
   //
   const mainFunc = `
 import {
-  Builder,
-  env
+  Avleon
 } from "@avleon/core";
 
 
-// create builder
-const builder = Builder.createAppBuilder();
-
-// registering all services and dependencies here
-// builder.addDataSource({
-//   type: "better-sqlite3",
-//   database: path.join(process.cwd(), "mydb.db"),
-//   entities: [Category, Product],
-//   synchronize: true,
-// });
-
-// build app
-const app = builder.build();
-
-app.useSwagger({
-  info: {
-    title: "${fname}",
-    description: "Your description here",
-    version: "0.0.1",
-  },
-  servers: [
-    {
-      url: "http://localhost:"+env.PORT,
-      description: "Development",
-    }
- ]
-
-});
-
-
+const app = Avleon.createApplication();
 app.mapGet('/', ()=> "Welcome");
+app.run();
 
-app.listen(env.PORT);
+`;
 
-`
+  const formatMainFunc = await prettier.format(mainFunc, {
+    singleQuote: true,
+    singleAttributePerLine: true,
+    parser: "typescript",
+  });
 
-  const formatMainFunc = await prettier.format(
-    mainFunc,
-    {
-      singleQuote: true,
-      singleAttributePerLine: true,
-      parser: "typescript",
-    },
-  );
-
-  await fs.writeFile(path.join(appPaths.src, 'app.ts'), formatMainFunc);
+  await fs.writeFile(path.join(appPaths.src, "app.ts"), formatMainFunc);
 
   // create package.json
   const packageJson = `
 {
   "name": "${fname}",
-  "version": "1.0.0",
-  "description": "",
+  "version": "0.0.0",
+  "description": "Basic avleon application",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon src/app.ts",
-    "start": "node dist/app.js",
-    "build": "rimraf dist && tsc"
+    "start:dev": "nodemon src/serve.ts",
+    "start:debug": "nodemon --watch src --ext ts --exec node --inspect=0.0.0.0:9229 -r ts-node/register src/serve.ts",
+    "clean": "rimraf ./dist",
+    "build": "npm run clean & tsc --project ./tsconfig.build.json",
+    "start": "node dist/serve.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:cov": "jest --coverage",
+    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
+    "test:e2e": "jest --config ./test/e2e-spec.json"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["avleon","nodejs","typescript"],
   "license": "ISC",
   "dependencies": {
+    "@avleon/core": "^0.0.25",
+    "@avleon/cli": "^0.0.25",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "reflect-metadata": "^0.2.2"
@@ -99,16 +69,17 @@ app.listen(env.PORT);
   }
 
 }
-`
+`;
 
-  const formattedPackageJson = await prettier.format(
-    packageJson,
-    {
-      parser: "json",
-    },
+  const formattedPackageJson = await prettier.format(packageJson, {
+    parser: "json",
+  });
+  await fs.writeFile(
+    path.join(appPaths.root, "package.json"),
+    formattedPackageJson
   );
-  await fs.writeFile(path.join(appPaths.root, 'package.json'), formattedPackageJson);
-  const tsconfigJson = await prettier.format(`{
+  const tsconfigJson = await prettier.format(
+    `{
   "compilerOptions": {
     "target": "ES2017",
     "module": "CommonJS",
@@ -123,24 +94,23 @@ app.listen(env.PORT);
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
-}`, { parser: 'json' })
-  await fs.writeFile(path.join(appPaths.root, 'tsconfig.json'), tsconfigJson);
-  await fs.writeFile(path.join(appPaths.root, '.gitignore'), `node_modules/\ndist/\n.env`);
+}`,
+    { parser: "json" }
+  );
+  await fs.writeFile(path.join(appPaths.root, "tsconfig.json"), tsconfigJson);
+  await fs.writeFile(
+    path.join(appPaths.root, ".gitignore"),
+    `node_modules/\ndist/\n.env`
+  );
   // create basic service
   // create basic controller
+  console.info("App created successfully. Run the following command to get start.");
+  console.log(`cd ${fname} && pnpm install`);
+  console.log(`npm run start:dev`);
 
+  //execSync(`cd ${fname} && pnpm install && pnpm add @avleon/core`, { stdio: 'inherit' })
 
-  console.info("Running pnpm install");
-
-  console.log(`cd ${fname}&& pnpm install`);
-
-  //execSync(`cd ${fname}&& pnpm install && pnpm add @avleon/core`, { stdio: 'inherit' })
-
-  console.info("App create successfully.");
-
-
+  console.info("Enjoy :D");
 }
 
-
-
-export { createApplication }
+export { createApplication };

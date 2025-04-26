@@ -1,7 +1,7 @@
 import { ApiController, Get, Post, Update, Delete, Param, Body, HttpResponse } from '@avleon/core';
 
 
-@ApiController('/{controllers}')
+@ApiController('/{controller}s')
 export class {Controller}{
 
   @Get()

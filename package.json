@@ -20,16 +20,19 @@
   "license": "ISC",
   "devDependencies": {
     "@types/fs-extra": "^11.0.4",
+    "@types/lodash": "^4.17.16",
     "@types/node": "^22.9.3",
     "nodemon": "^3.1.7",
     "tsc-watch": "^6.2.1",
+    "tsup": "^8.4.0",
     "typescript": "^5.7.2"
   },
   "dependencies": {
-    "chalk": "^4",
-    "prettier": "^3.3.3",
+    "chalk": "^5.4.1",
     "cli-table3": "^0.6.5",
-    "fs-extra": "^11.2.0"
+    "fs-extra": "^11.2.0",
+    "lodash": "^4.17.21",
+    "prettier": "^3.3.3"
   },
   "repository": {
     "type": "git",
