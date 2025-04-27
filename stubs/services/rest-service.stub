@@ -1,0 +1,34 @@
+import { AppService, Collection } from '@avleon/core';
+
+@AppService
+export class {Service}{
+
+  constructor(
+    private readonly {modelRepository}:Collection.fromRepository({Model})
+  )
+
+  findAll(options?:any){
+    if(options && options.page){
+      return this.{modelRepository}.paginate(options.page)
+    }
+    return this.{modelRepository}.find(); 
+  }
+
+  findOne(id:{pktype}){
+    return this.{modelRepository}.findOne({where:{id}}) ;
+  }
+
+  create(createBody:{createBodyType}){
+    const newItem = this.{modelRepository}.create();
+    return await this.{modelRepository}.save();
+  }
+
+  update(id:{pktype}, updateBody:{updateBodyType}){
+    return this.{modelRepository}.update({id}, updateBody); 
+  }
+
+  delete(id:{pktype}){
+    return this.modelRepository.delete({id});
+  }
+
+}

@@ -1,14 +1,15 @@
 {
   "name": "@avleon/cli",
-  "version": "0.0.7",
+  "version": "0.0.26@alpha",
   "bin": {
-    "avleon": "./dist/cli.js"
+    "avleon": "./dist/cli.js",
+    "av":"./dist/cli.js"
   },
   "description": "",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc",
+    "build": "rimraf dist & tsc",
     "clean": "rm -rf ./dist",
     "watch": "tsc-watch"
   },
@@ -32,7 +33,8 @@
     "cli-table3": "^0.6.5",
     "fs-extra": "^11.2.0",
     "lodash": "^4.17.21",
-    "prettier": "^3.3.3"
+    "prettier": "^3.3.3",
+    "rimraf": "^6.0.1"
   },
   "repository": {
     "type": "git",

@@ -1,11 +1,11 @@
 import fs from "fs-extra";
-import { appPaths as getAppPaths } from "./paths";
+import { appPathsMinimal, appPaths as getAppPaths } from "./paths";
 import * as prettier from "prettier";
 import path from "path/win32";
 import { execSync } from "child_process";
 
-async function createApplication(fname: any) {
-  const appPaths = getAppPaths(fname);
+async function createApplication(fname: any, flags:any={}) {
+  let appPaths = getAppPaths(fname);
   const dirs = Object.values(appPaths);
   for (let i = 0; i < dirs.length; i++) {
     await fs.ensureDir(dirs[i]);
@@ -18,12 +18,21 @@ async function createApplication(fname: any) {
 import {
   Avleon
 } from "@avleon/core";
+import {HomeController} from './controllers/home.controller';
 
 
 const app = Avleon.createApplication();
-app.mapGet('/', ()=> "Welcome");
-app.run();
+app.useOpenApi({
+  info:{
+    title: '${fname} Api',
+    version: '0.0.1'
+  }
+});
 
+app.useControllers([HomeController]);
+app.useStaticFiles();
+
+export default app;
 `;
 
   const formatMainFunc = await prettier.format(mainFunc, {
@@ -34,6 +43,33 @@ app.run();
 
   await fs.writeFile(path.join(appPaths.src, "app.ts"), formatMainFunc);
 
+
+
+
+  // create serve.ts 
+  const serveFunc = `
+import app from "./app";
+
+async function serve(){
+  app.run();
+}
+
+serve();
+`;
+
+  const formatServeFunc = await prettier.format(serveFunc, {
+    singleQuote: true,
+    singleAttributePerLine: true,
+    parser: "typescript",
+  });
+
+  await fs.writeFile(path.join(appPaths.src, "serve.ts"), formatServeFunc);
+
+
+
+
+
+
   // create package.json
   const packageJson = `
 {
@@ -42,7 +78,7 @@ app.run();
   "description": "Basic avleon application",
   "main": "index.js",
   "scripts": {
-    "start:dev": "nodemon src/serve.ts",
+    "start:dev": "nodemon /src/serve.ts",
     "start:debug": "nodemon --watch src --ext ts --exec node --inspect=0.0.0.0:9229 -r ts-node/register src/serve.ts",
     "clean": "rimraf ./dist",
     "build": "npm run clean & tsc --project ./tsconfig.build.json",
@@ -63,9 +99,22 @@ app.run();
     "reflect-metadata": "^0.2.2"
   },
   "devDependencies": {
+      "@types/jest": "^29.5.14",
+      "jest": "^29.7.0",
+      "ts-jest": "^29.2.6",
     "nodemon": "^3.1.7",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.2"
+  },
+    "jest": {
+    "preset": "ts-jest",
+    "rootDir": "src",
+    "testRegex": ".*\\.spec\\.ts$",
+    "collectCoverageFrom": [
+      "**/*.(t|j)s"
+    ],
+    "coverageDirectory": "../coverage",
+    "testEnvironment": "node"
   }
 
 }
@@ -98,6 +147,28 @@ app.run();
     { parser: "json" }
   );
   await fs.writeFile(path.join(appPaths.root, "tsconfig.json"), tsconfigJson);
+
+
+  // write e2e-test.json
+  const e2eJson = await prettier.format(
+    `{
+  "moduleFileExtensions": [
+    "js",
+    "json",
+    "ts"
+  ],
+  "rootDir": ".",
+  "testEnvironment": "node",
+  "testRegex": ".e2e-spec.ts$",
+  "transform": {
+    "^.+\\.(t|j)s$": "ts-jest"
+  }
+}`,
+    { parser: "json" }
+  );
+  await fs.writeFile(path.join(appPaths.root, "test/e2e-spec.json"), e2eJson);
+
+
   await fs.writeFile(
     path.join(appPaths.root, ".gitignore"),
     `node_modules/\ndist/\n.env`

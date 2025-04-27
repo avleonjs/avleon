@@ -1,9 +1,14 @@
 import path from "node:path";
 
-export type AppPaths = {
+export type BasicAppPaths = {
   root: string,
   src: string,
   test: string,
+  public: string
+
+}
+
+export type AppPaths = BasicAppPaths & {
   controllers: string,
   models: string,
   services: string,
@@ -13,11 +18,22 @@ export type AppPaths = {
 }
 
 
+export const appPathsMinimal = (rootPath?: string): BasicAppPaths => {
+  const root = rootPath ? rootPath : path.join(process.cwd(), "./");
+  return {
+    root: root,
+    src: path.join(root, "src"),
+    public: path.join(root,"public"),
+    test: path.join(root, "test"),
+  }
+}
+
 export const appPaths = (rootPath?: string): AppPaths => {
   const root = rootPath ? rootPath : path.join(process.cwd(), "./");
   return {
     root: root,
     src: path.join(root, "src"),
+    public: path.join(root, "public"),
     test: path.join(root, "test"),
     controllers: path.join(root, "src/controllers"),
     models: path.join(root, "src/models"),

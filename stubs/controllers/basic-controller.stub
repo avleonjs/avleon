@@ -1,0 +1,12 @@
+import { ApiController, Get, HttpResponse } from '@avleon/core';
+
+
+@ApiController('/{controller}s')
+export class {Controller}{
+
+  @Get()
+  index(){
+    return "{controller} ok";
+  }
+
+}

@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "ES2017",
+    "target": "ES2021",
     "module": "CommonJS",
     "moduleResolution": "node",
     "outDir": "./dist",
@@ -10,6 +10,6 @@
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "src/stubs"],
   "exclude": ["node_modules", "dist"]
 }
