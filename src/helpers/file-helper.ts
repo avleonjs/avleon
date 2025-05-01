@@ -8,7 +8,7 @@ export function getLastPart(str: string, separator: any) {
   }
   
   export function resolveNames(name: string,exclude:string) {
-    const parsedName = name.replace(exclude, '')
+    const parsedName = name.replace(exclude,'')
   
     return {
       className: parsedName.charAt(0).toUpperCase() + name.slice(1),

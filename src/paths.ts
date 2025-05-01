@@ -12,9 +12,8 @@ export type AppPaths = BasicAppPaths & {
   controllers: string,
   models: string,
   services: string,
-  requests: string,
-  responses: string,
   configs: string
+  dtos: string
 }
 
 
@@ -23,7 +22,7 @@ export const appPathsMinimal = (rootPath?: string): BasicAppPaths => {
   return {
     root: root,
     src: path.join(root, "src"),
-    public: path.join(root,"public"),
+    public: path.join(root, "public"),
     test: path.join(root, "test"),
   }
 }
@@ -38,8 +37,7 @@ export const appPaths = (rootPath?: string): AppPaths => {
     controllers: path.join(root, "src/controllers"),
     models: path.join(root, "src/models"),
     services: path.join(root, "src/services"),
-    requests: path.join(root, "src/requests"),
-    responses: path.join(root, "src/responses"),
+    dtos: path.join(root, "src/dtos"),
     configs: path.join(root, "src/configs")
   }
 }

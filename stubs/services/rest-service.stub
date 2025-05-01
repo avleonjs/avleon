@@ -1,34 +1,73 @@
-import { AppService, Collection } from '@avleon/core';
+import { AppService, InjectRepository } from '@avleon/core';
+import { Repository } from 'typeorm';
+import { {Model} } from '../models/{model}.model';
+
 
 @AppService
-export class {Service}{
+export class {Service}Service{
 
   constructor(
-    private readonly {modelRepository}:Collection.fromRepository({Model})
-  )
+    @InjectRepository({Model})
+    private readonly {model}Repository:Repository<{Model}>
+  ){}
 
-  findAll(options?:any){
-    if(options && options.page){
-      return this.{modelRepository}.paginate(options.page)
-    }
-    return this.{modelRepository}.find(); 
+  async findAll(options:any={}){
+    return this.{model}Repository.find(options); 
   }
 
-  findOne(id:{pktype}){
-    return this.{modelRepository}.findOne({where:{id}}) ;
+  async paginate(current:number = 1, options:any={}){
+    const take = 10;
+    const skip = current >  1 ? ( current -1 ) * 10 : 0;
+    const total = await this.{model}Repository.count(options);
+    const totalPage = Math.ceil(total / take);
+    const next = current < totalPage ? current + 1 : null;
+    const prev = current > 1 ? current - 1 : null;
+    const data = await this.{model}Repository.find({
+        ...options,
+        take,
+        skip
+    })
+
+    return {
+        total,
+        totalPage,
+        current,
+        next,
+        prev,
+        data
+    };
   }
 
-  create(createBody:{createBodyType}){
-    const newItem = this.{modelRepository}.create();
-    return await this.{modelRepository}.save();
+  async findByPk(id:number){
+    return this.{model}Repository.findOne({id});
   }
 
-  update(id:{pktype}, updateBody:{updateBodyType}){
-    return this.{modelRepository}.update({id}, updateBody); 
+  async findBy(options:any){
+    return this.{model}Repository.findBy(options);
   }
 
-  delete(id:{pktype}){
-    return this.modelRepository.delete({id});
+  async findOneBy(options:any){
+    return this.{model}Repository.findOneBy(options);
+  }
+
+
+  async findOne(id:number){
+    return this.{model}Repository.findOne({where:{id}}) ;
+  }
+
+  async create(createBody:any){
+    const newItem = this.{model}Repository.create();
+    return await this.{model}Repository.save();
+  }
+
+  async update(id:number, updateBody:any){
+    const isUpdate = await this.{model}Repository.update({id}, updateBody); 
+    return isUpdate.affected > 0;
+  }
+
+  async delete(id:number){
+    const isDeleted = await this.{model}Repository.delete({id});
+    return isDeleted.affected > 0;
   }
 
 }

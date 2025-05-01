@@ -2,9 +2,8 @@ import fs from "fs-extra";
 import { appPathsMinimal, appPaths as getAppPaths } from "./paths";
 import * as prettier from "prettier";
 import path from "path/win32";
-import { execSync } from "child_process";
 
-async function createApplication(fname: any, flags:any={}) {
+async function createApplication(fname: any, flags: any = {}) {
   let appPaths = getAppPaths(fname);
   const dirs = Object.values(appPaths);
   for (let i = 0; i < dirs.length; i++) {
@@ -68,13 +67,11 @@ serve();
 
 
 
-
-
   // create package.json
   const packageJson = `
 {
   "name": "${fname}",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Basic avleon application",
   "main": "index.js",
   "scripts": {
@@ -109,7 +106,7 @@ serve();
     "jest": {
     "preset": "ts-jest",
     "rootDir": "src",
-    "testRegex": ".*\\.spec\\.ts$",
+    "testRegex": ".*/\/\.spec/\/\.ts$",
     "collectCoverageFrom": [
       "**/*.(t|j)s"
     ],
@@ -161,7 +158,7 @@ serve();
   "testEnvironment": "node",
   "testRegex": ".e2e-spec.ts$",
   "transform": {
-    "^.+\\.(t|j)s$": "ts-jest"
+    "^.+/\/\.(t|j)s$": "ts-jest"
   }
 }`,
     { parser: "json" }

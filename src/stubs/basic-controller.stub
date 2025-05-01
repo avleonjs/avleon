@@ -1,7 +1,0 @@
-import { Get, HttpResponse } from '@avleon/core'; 
-export class {{name}}{
-    constructor(
-      private readonly {}
-    ){}
-}
-
