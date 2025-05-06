@@ -2,7 +2,7 @@ import { existsSync } from "fs";
 import path from "path";
 import { pathHelper } from "./helpers/path-helper";
 import fs from 'node:fs/promises'
-import { fh, resolveNames } from "./helpers/file-helper";
+import { fh, getFilePathWithoutName, resolveNames } from "./helpers/file-helper";
 import { kebabCase } from "lodash";
 
 function capitalize(str: string) {
@@ -15,7 +15,7 @@ function lower(str: string) {
 }
 async function createController(
   name: string,
-  options = { force: false, resource: false, rest: false, model: null },
+  options = { force: false, resource: false, rest: false, model: null, root: null },
   p?: string
 ) {
   if (!name) {
@@ -30,10 +30,11 @@ async function createController(
       stubPath = pathHelper.stubPath('controllers/orm-rest-controller.stub');
     }
   }
+  const rootPath = options.root ? 'src/' + options.root + '/' : 'src/controllers/';
 
   if (name.split("/").length > 1) {
-    if (!existsSync(path.join('src/controllers/', name.split("/").splice(-1, 1).join("/")))) {
-      await fs.mkdir(path.join('src/controllers/', name.replace('/' + fh.filenameFromPath(name), '')), { recursive: true })
+    if (!existsSync(path.join(rootPath, name.split("/").splice(-1, 1).join("/")))) {
+      await fs.mkdir(path.join(rootPath, name.replace('/' + fh.filenameFromPath(name), '')), { recursive: true })
     }
   }
 
@@ -41,12 +42,9 @@ async function createController(
   const names = resolveNames(fh.filenameFromPath(name), 'Controller');
   const className = names.className.replace("Controller", '');
 
-  console.log('STUB_CON', content);
   if (options.model) {
-
     await createRestService(className, options.model);
   }
-
 
   let replacedContent = content
     .replaceAll('{Controller}', className)
@@ -58,7 +56,7 @@ async function createController(
   }
 
 
-  await fs.writeFile(path.join('src/controllers/', kebabCase(className) + '.controller.ts'), replacedContent, 'utf8');
+  await fs.writeFile(path.join(rootPath, getFilePathWithoutName(name) + "/" + kebabCase(className) + '.controller.ts'), replacedContent, 'utf8');
   console.log("Controller created succssessfully!");
 }
 

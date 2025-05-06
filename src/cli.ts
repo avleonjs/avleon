@@ -10,7 +10,7 @@ import { commandList } from "./commands";
 import { exec, execSync } from "child_process";
 import { createApplication } from "./create";
 
-export function iqraCli() {}
+export function iqraCli() { }
 
 const listedCommands = commandList
   .flatMap((x) => x.Command)
@@ -151,11 +151,11 @@ export async function run() {
         if (args.some((x) => x == "--mimimal")) {
           minimal = true;
         }
-        const flags = {minimal, force};
+        const flags = { minimal, force };
         if (args[0] == "new") {
           const fname = args[1];
-         
-          await createApplication(fname,flags);
+
+          await createApplication(fname, flags);
         }
         if (args[0] == "build") {
           process.env.NODE_ENV = "production";
@@ -170,12 +170,14 @@ export async function run() {
         if (args[0] == "make:controller" || args[0] == "m:c") {
           let resource = false;
           let rest = false;
+          let root = null;
           if (args.some((x) => x == "-r" || x == "--resource")) {
             resource = true;
           }
           if (args.some((x) => x == "-r" || x == "--rest")) {
             rest = true;
           }
+
           let model = null;
           if (args.some((x) => x == "-m" || x == "--model")) {
             const index = args.includes("-m")
@@ -187,7 +189,18 @@ export async function run() {
             const modelName = args[index + 1];
             model = modelName;
           }
-          await createController(args[1], { force, resource, rest, model });
+
+          if (args.some((x) => x == "-rt" || x == "--root")) {
+            const index = args.includes("-rt")
+              ? args.indexOf("-rt")
+              : args.indexOf("--root");
+            if (args[index + 1] == undefined) {
+              throw new Error("Root Path not defined");
+            }
+            const rootPath = args[index + 1];
+            root = rootPath;
+          }
+          await createController(args[1], { force, resource, rest, model, root });
         }
       }
     }
