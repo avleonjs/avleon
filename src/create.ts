@@ -4,6 +4,10 @@ import * as prettier from "prettier";
 import path from "path/win32";
 
 import inquirer from 'inquirer';
+import { exec } from 'child_process';
+import util from 'util';
+
+const execAsync = util.promisify(exec);
 
 async function askForPackageManager(): Promise<'npm' | 'yarn' | 'pnpm'> {
   const { packageManager } = await inquirer.prompt([
@@ -105,8 +109,8 @@ serve();
   "keywords": ["avleon","nodejs","typescript"],
   "license": "ISC",
   "dependencies": {
-    "@avleon/core": "^0.0.25",
-    "@avleon/cli": "^0.0.25",
+    "@avleon/core": "^0.0.27",
+    "@avleon/cli": "^0.0.28",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "reflect-metadata": "^0.2.2"
@@ -189,11 +193,16 @@ serve();
   // create basic service
   // create basic controller
   console.info("App created successfully. Run the following command to get start.");
-  console.log(`cd ${fname} && ${pm} install`);
-  console.log(pm == 'npm' ? `npm run start:dev` : `${pm} start:dev`);
-
-  //execSync(`cd ${fname} && pnpm install && pnpm add @avleon/core`, { stdio: 'inherit' })
-
+  //  console.log(`cd ${fname} && ${pm} install`);
+  // console.log(pm == 'npm' ? `npm run start:dev` : `${pm} start:dev`);
+  try {
+    console.log(`Running ${pm} install...`);
+    await execAsync(`cd ${fname}`);
+    await execAsync(`${pm} install`);
+    console.log('✅ Dependencies installed successfully.');
+  } catch (error) {
+    console.error('❌ Installation failed:', error);
+  }
   console.info("Enjoy :D");
 }
 
