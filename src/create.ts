@@ -3,8 +3,24 @@ import { appPathsMinimal, appPaths as getAppPaths } from "./paths";
 import * as prettier from "prettier";
 import path from "path/win32";
 
+import inquirer from 'inquirer';
+
+async function askForPackageManager(): Promise<'npm' | 'yarn' | 'pnpm'> {
+  const { packageManager } = await inquirer.prompt([
+    {
+      type: 'list',
+      name: 'packageManager',
+      message: 'Which package manager do you want to use?',
+      choices: ['npm', 'yarn', 'pnpm'],
+      default: 'npm'
+    }
+  ]);
+
+  return packageManager;
+}
 async function createApplication(fname: any, flags: any = {}) {
   let appPaths = getAppPaths(fname);
+  const pm = await askForPackageManager();
   const dirs = Object.values(appPaths);
   for (let i = 0; i < dirs.length; i++) {
     await fs.ensureDir(dirs[i]);
@@ -173,8 +189,8 @@ serve();
   // create basic service
   // create basic controller
   console.info("App created successfully. Run the following command to get start.");
-  console.log(`cd ${fname} && pnpm install`);
-  console.log(`npm run start:dev`);
+  console.log(`cd ${fname} && ${pm} install`);
+  console.log(pm == 'npm' ? `npm run start:dev` : `${pm} start:dev`);
 
   //execSync(`cd ${fname} && pnpm install && pnpm add @avleon/core`, { stdio: 'inherit' })
 

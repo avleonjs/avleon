@@ -34,18 +34,18 @@ export class {Controller}Controller{
   @Post('/:id')
   async update(@Param('id') id:number, updateBody:any){
     const is{Model} = await this.{model}Service.findByPk(id);
-    if(!is{Model}) throw HttpExceptions.NotFound("{Model} not found.");
+    if(!is{Model}) throw HttpExceptions.notFound("{Model} not found.");
     const isUpdated = await this.{model}Service.update(id,updateBody);
-    if(!isUpdated) throw HttpExceptions.InternalError("Can't update {Model}");
+    if(!isUpdated) throw HttpExceptions.internalError("Can't update {Model}");
     return "Updated Successfully";
   }
 
   @Delete('/:id')
   async delete(@Param('id') id:number){
     const is{Model} = await this.{model}Service.findByPk(id);
-    if(!is{Model}) throw HttpExceptions.NotFound("{Model} not found.");
+    if(!is{Model}) throw HttpExceptions.notFound("{Model} not found.");
     const isDeleted = await this.{model}Service.delete(id);
-    if(!isDeleted) throw HttpExceptions.InternalError("Can't delete");
+    if(!isDeleted) throw HttpExceptions.internalError("Can't delete");
     return "Deleted Successfully";
   }
 

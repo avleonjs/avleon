@@ -170,12 +170,16 @@ export async function run() {
         if (args[0] == "make:controller" || args[0] == "m:c") {
           let resource = false;
           let rest = false;
+          let prefix = true;
           let root = null;
           if (args.some((x) => x == "-r" || x == "--resource")) {
             resource = true;
           }
           if (args.some((x) => x == "-r" || x == "--rest")) {
             rest = true;
+          }
+          if (args.some((x) => x == "--base-path")) {
+            prefix = false;
           }
 
           let model = null;
@@ -200,7 +204,7 @@ export async function run() {
             const rootPath = args[index + 1];
             root = rootPath;
           }
-          await createController(args[1], { force, resource, rest, model, root });
+          await createController(args[1], { force, resource, prefix, rest, model, root });
         }
       }
     }
