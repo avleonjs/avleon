@@ -198,7 +198,7 @@ serve();
   try {
     console.log(`Running ${pm} install...`);
     await execAsync(`cd ${fname}`);
-    await execAsync(`${pm} install`);
+    await execAsync(`${pm} install`, { cwd: fname, shell: true });
     console.log('✅ Dependencies installed successfully.');
   } catch (error) {
     console.error('❌ Installation failed:', error);
