@@ -4,7 +4,7 @@ import * as prettier from "prettier";
 import path from "path/win32";
 import os from 'os';
 import inquirer from 'inquirer';
-import { exec } from 'child_process';
+import { exec, spawn } from 'child_process';
 import util from 'util';
 
 const execAsync = util.promisify(exec);
@@ -26,6 +26,31 @@ async function askForPackageManager(): Promise<'npm' | 'yarn' | 'pnpm'> {
   ]);
 
   return packageManager;
+}
+
+async function installDependencies(pm: string, fname: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const child = spawn(pm, ['install'], {
+      cwd: fname,
+      shell: getShell(),
+      stdio: 'inherit', 
+    });
+
+    child.on('exit', (code) => {
+      if (code === 0) {
+        console.log('✅ Dependencies installed successfully.');
+        resolve();
+      } else {
+        console.error(`❌ Installation failed with exit code ${code}`);
+        reject(new Error(`Install failed with code ${code}`));
+      }
+    });
+
+    child.on('error', (err) => {
+      console.error('❌ Failed to start install process:', err);
+      reject(err);
+    });
+  });
 }
 async function createApplication(fname: any, flags: any = {}) {
   let appPaths = getAppPaths(fname);
@@ -125,8 +150,8 @@ serve();
   "description": "Basic avleon application",
   "main": "index.js",
   "scripts": {
-    "start:dev": "nodemon /src/serve.ts",
-    "start:debug": "nodemon --watch src --ext ts --exec node --inspect=0.0.0.0:9229 -r ts-node/register src/serve.ts",
+    "start:dev": "nodemon ./src/serve.ts",
+    "start:debug": "nodemon --watch src --ext ts --exec node --inspect=0.0.0.0:9229 -r ts-node/register ./src/serve.ts",
     "clean": "rimraf ./dist",
     "build": "npm run clean & tsc --project ./tsconfig.build.json",
     "start": "node dist/serve.js",
@@ -140,7 +165,7 @@ serve();
   "license": "ISC",
   "dependencies": {
     "@avleon/core": "^0.0.28",
-    "@avleon/cli": "^0.0.34",
+    "@avleon/cli": "^0.0.35",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "reflect-metadata": "^0.2.2"
@@ -228,8 +253,8 @@ serve();
   try {
     console.log(`Running ${pm} install...`);
     await execAsync(`cd ${fname}`);
-    await execAsync(`${pm} install`, { cwd: fname, shell: getShell() });
-    console.log(`cd ${fname} && ${pm} install`);
+    await installDependencies(pm, fname);
+    console.log(`cd ${fname}`);
     console.log(pm == 'npm' ? `npm run start:dev` : `${pm} start:dev`);
     console.log('✅ Dependencies installed successfully.');
   } catch (error) {
