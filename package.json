@@ -1,6 +1,6 @@
 {
   "name": "@avleon/cli",
-  "version": "0.0.33",
+  "version": "0.0.34",
   "bin": {
     "avleon": "./dist/cli.js"
   },
@@ -10,6 +10,7 @@
   "scripts": {
     "build": "rimraf dist & tsc",
     "clean": "rm -rf ./dist",
+    "prepublish": "npm run build",
     "watch": "tsc-watch"
   },
   "keywords": [
