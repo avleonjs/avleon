@@ -2,13 +2,18 @@ import fs from "fs-extra";
 import { appPathsMinimal, appPaths as getAppPaths } from "./paths";
 import * as prettier from "prettier";
 import path from "path/win32";
-
+import os from 'os';
 import inquirer from 'inquirer';
 import { exec } from 'child_process';
 import util from 'util';
 
 const execAsync = util.promisify(exec);
-
+const getShell = () => {
+  if (os.platform() === 'win32') {
+    return process.env.ComSpec || 'cmd.exe'; // Windows fallback
+  }
+  return process.env.SHELL || '/bin/sh'; // macOS/Linux fallback
+};
 async function askForPackageManager(): Promise<'npm' | 'yarn' | 'pnpm'> {
   const { packageManager } = await inquirer.prompt([
     {
@@ -110,15 +115,15 @@ serve();
   "license": "ISC",
   "dependencies": {
     "@avleon/core": "^0.0.27",
-    "@avleon/cli": "^0.0.28",
+    "@avleon/cli": "^0.0.32",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "reflect-metadata": "^0.2.2"
   },
   "devDependencies": {
-      "@types/jest": "^29.5.14",
-      "jest": "^29.7.0",
-      "ts-jest": "^29.2.6",
+    "@types/jest": "^29.5.14",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.2.6",
     "nodemon": "^3.1.7",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.2"
@@ -198,7 +203,7 @@ serve();
   try {
     console.log(`Running ${pm} install...`);
     await execAsync(`cd ${fname}`);
-    await execAsync(`${pm} install`, { cwd: fname, shell: true });
+    await execAsync(`${pm} install`, { cwd: fname, shell: getShell() });
     console.log('✅ Dependencies installed successfully.');
   } catch (error) {
     console.error('❌ Installation failed:', error);
