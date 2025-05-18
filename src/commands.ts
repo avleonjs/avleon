@@ -15,8 +15,8 @@ export const commandList: CommandType[] = [
   },
   {
     Command: "make:model",
-    Alias: "m:m, mm",
-    Options: "-f --force",
+    Alias: "m:m",
+    Options: "-f --force, --orm",
     Description:
       "Create a new model. Use -f or --froce to overwrite if any model exists with name",
   },
@@ -34,7 +34,7 @@ model properties.
   {
     Command: "make:service",
     Alias: "m:s",
-    Options: `-f, --force for force create\n -r or --resource for resource controller`,
+    Options: `-f, --force for force create\n -r or --resource for resource controller, --dtos`,
     Description: `Create a new controller. Use -f or --force to overwrite existing controller. If you want to create a resource controller pass options -r or --resource. 
 You may also pass model by -m or --model.\n
 ${chalk.blueBright("Note:")} when using a resource contorller iqra will automaticall check for dtos related to model name. If -m is user then
@@ -43,14 +43,18 @@ model properties.
     `,
   },
   {
-    Command: "make:resource",
-    Alias: "m:r",
-    Options: `-f, --force for force create\n -r or --resource for resource`,
-    Description: `Create a new resource. Use -f or --force to overwrite existing controller. If you want to create a resource controller pass options -r or --resource. 
-You may also pass model by -m or --model.\n
-${chalk.blueBright("Note:")} when using a resource contorller iqra will automaticall check for dtos related to model name. If -m is user then
-it will check for dtos like UserCreateDto and UserUpdateDto. If dtos not found it will create automatically using 
-model properties.
-    `,
+    Command: "make:config",
+    Alias: "m:cnf",
+    Options: "-f --force",
+    Description:
+      "Create a new config. Use -f or --froce to overwrite if any config exists with name",
+  },
+
+    {
+    Command: "make:middleware",
+    Alias: "m:mlwr",
+    Options: "-f --force",
+    Description:
+      "Create a new middleware. Use -f or --froce to overwrite if any config exists with name",
   },
 ];

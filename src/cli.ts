@@ -9,6 +9,7 @@ import { createController } from "./controller";
 import { commandList } from "./commands";
 import { exec, execSync } from "child_process";
 import { createApplication } from "./create";
+import { createService } from "./service";
 
 export function iqraCli() { }
 
@@ -67,7 +68,7 @@ async function displayCommandList(info = { logo: true, all: false }) {
   }
 }
 
-async function createModel(name: string, options = { force: false }) {
+async function createModel(name: string, options = { force: false, orm: false }) {
   if (!name) {
     throw new Error(
       "Model name not found . use --name or node artisan make:model ModelName",
@@ -93,7 +94,15 @@ async function createModel(name: string, options = { force: false }) {
     return;
   }
 
-  const model = `
+  const basicModel = `
+      \t
+  export class ${modelName}{
+  id:number;
+  name: string;
+}
+  `
+
+  const ormModel = `
 import {Entity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 \t
   @Entity({name:'${modelName}'})
@@ -110,7 +119,7 @@ import {Entity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } fro
 }
 `;
 
-  const formatModel = await prettier.format(model, {
+  const formatModel = await prettier.format(options.orm ? ormModel : basicModel, {
     singleQuote: true,
     singleAttributePerLine: true,
     parser: "typescript",
@@ -122,6 +131,117 @@ import {Entity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } fro
   );
 
   console.log("Model created succssessfully!");
+}
+
+async function createMiddleware(name: string, options = { force: false }) {
+  if (!name) {
+    throw new Error(
+      "Model name not found . use --name or node artisan make:model ModelName",
+    );
+  }
+  const modelName = name.at(0).toUpperCase() + name.slice(1);
+  const modelExists = existsSync(
+    path.join(process.cwd(), `./src/middlewares/${modelName.toLowerCase()}.middleware.ts`),
+  );
+
+  if (modelExists && !options.force) {
+    console.log("Middleware already exists!", "Use -f or --force to overwrite.\r");
+    return;
+  }
+
+  const modelFolderExists = existsSync(
+    path.join(process.cwd(), "./src/middlewares"),
+  );
+  if (!modelFolderExists) {
+    await fs.mkdir(path.join(process.cwd(), "./src/middleware"), {
+      recursive: true,
+    });
+  }
+
+  const basicMiddleware = `
+      \t
+import { Middleware, IMiddleware } from '@avleon/core';
+
+@Middleware
+export class ${modelName}Middleware implements IMiddleware{
+
+    invoke(req:IRequest){
+      // your logic goes here
+      return req;
+    }
+ 
+}
+  `
+
+  const formatModel = await prettier.format(basicMiddleware, {
+    singleQuote: true,
+    singleAttributePerLine: true,
+    parser: "typescript",
+  });
+
+  await fs.writeFile(
+    path.join(process.cwd(), "./src/middlewares/" + modelName.toLowerCase() + ".ts"),
+    formatModel,
+  );
+
+  console.log("Middleware created succssessfully!");
+}
+
+
+async function createConfig(name: string, options = { force: false }) {
+  if (!name) {
+    throw new Error(
+      "Config name not found . use --name or node artisan make:config JwtConfig",
+    );
+  }
+  const modelName = name.at(0).toUpperCase() + name.slice(1);
+  const modelExists = existsSync(
+    path.join(process.cwd(), `./src/cinfigs/${modelName.toLowerCase()}.ts`),
+  );
+
+  if (modelExists && !options.force) {
+    console.log("Config already exists!", "Use -f or --force to overwrite.\r");
+    return;
+  }
+
+  const modelFolderExists = existsSync(
+    path.join(process.cwd(), "./src/configs"),
+  );
+  if (!modelFolderExists) {
+    await fs.mkdir(path.join(process.cwd(), "./src/configs"), {
+      recursive: true,
+    });
+  }
+
+  const basicMiddleware = `
+      \t
+import { Config, IConfig } from '@avleon/core';
+
+@AppConfig
+export class ${modelName}Middleware implements IConfig<T>{
+
+    config(env: Environment){
+      // config must return config
+      return {
+      
+      };
+    }
+ 
+}
+  `
+
+  const formatModel = await prettier.format(basicMiddleware, {
+    singleQuote: true,
+    singleAttributePerLine: true,
+    parser: "typescript",
+  });
+
+  await fs.writeFile(
+    path.join(process.cwd(), "./src/middlewares/" + modelName.toLowerCase() + ".ts"),
+    formatModel,
+  );
+
+  console.log("Middleware created succssessfully!");
 }
 
 
@@ -153,8 +273,10 @@ export async function run() {
         }
         const flags = { minimal, force };
         if (args[0] == "new") {
+          if (args[1] == undefined) {
+            throw new Error('Please provide a project name. Ex avleon new example_api')
+          }
           const fname = args[1];
-
           await createApplication(fname, flags);
         }
         if (args[0] == "build") {
@@ -165,8 +287,18 @@ export async function run() {
           console.log("Build successfully");
         }
         if (args[0] == "make:model") {
-          await createModel(args[1], { force });
+          const orm = args.some((x) => x == "--orm")
+          await createModel(args[1], { force, orm });
         }
+
+        if (args[0] == "make:config" || args[0] == "m:cfg") {
+          await createConfig(args[1], { force });
+        }
+
+        if (args[0] == "make:middleware" || args[0] == "m:mdlr") {
+          await createMiddleware(args[1], { force });
+        }
+
         if (args[0] == "make:controller" || args[0] == "m:c") {
           let resource = false;
           let rest = false;
@@ -205,6 +337,40 @@ export async function run() {
             root = rootPath;
           }
           await createController(args[1], { force, resource, prefix, rest, model, root });
+        }
+
+        if (args[0] == "make:service" || args[0] == "m:s") {
+          let resource = false;
+          let rest = false;
+          let prefix = true;
+          let root = null;
+          if (args.some((x) => x == "-r" || x == "--resource" || x == '--rest')) {
+            resource = true;
+            rest = true;
+          }
+          let model = null;
+          if (args.some((x) => x == "-m" || x == "--model")) {
+            const index = args.includes("-m")
+              ? args.indexOf("-m")
+              : args.indexOf("--model");
+            if (args[index + 1] == undefined) {
+              throw new Error("Model not defined");
+            }
+            const modelName = args[index + 1];
+            model = modelName;
+          }
+
+          if (args.some((x) => x == "-rt" || x == "--root")) {
+            const index = args.includes("-rt")
+              ? args.indexOf("-rt")
+              : args.indexOf("--root");
+            if (args[index + 1] == undefined) {
+              throw new Error("Root Path not defined");
+            }
+            const rootPath = args[index + 1];
+            root = rootPath;
+          }
+          await createService(args[1], { force, resource, prefix, rest, model, root });
         }
       }
     }

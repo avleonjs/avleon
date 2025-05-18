@@ -39,6 +39,8 @@ async function installDependencies(pm: string, fname: string): Promise<void> {
     child.on('exit', (code) => {
       if (code === 0) {
         console.log('✅ Dependencies installed successfully.');
+        console.log(`cd ${fname}`);
+        console.log(pm == 'npm' ? `npm run start:dev` : `${pm} start:dev`);
         resolve();
       } else {
         console.error(`❌ Installation failed with exit code ${code}`);
@@ -61,6 +63,9 @@ async function createApplication(fname: any, flags: any = {}) {
   // }
 
   await fs.ensureDir(appPaths.root + "/src");
+  await fs.ensureDir(appPaths.root + "/src/controllers");
+  await fs.ensureDir(appPaths.root + "/src/services");
+  await fs.ensureDir(appPaths.root + "/src/models");
   await fs.ensureDir(appPaths.root + "/test");
   await fs.ensureDir(appPaths.root + "/public");
   // copy
@@ -102,7 +107,7 @@ app.useOpenApi({
   }
 });
 
-app.useControllers([HomeController]);
+app.useControllers([ HomeController ]);
 app.useStaticFiles();
 
 export default app;
@@ -121,14 +126,14 @@ export default app;
 
 
   // create serve.ts 
-  const serveFunc = `
+const serveFunc = `
 import app from "./app";
 
-async function serve(){
+async function start(){
   app.run();
 }
 
-serve();
+start();
 `;
 
   const formatServeFunc = await prettier.format(serveFunc, {
@@ -151,10 +156,10 @@ serve();
   "main": "index.js",
   "scripts": {
     "start:dev": "nodemon ./src/serve.ts",
-    "start:debug": "nodemon --watch src --ext ts --exec node --inspect=0.0.0.0:9229 -r ts-node/register ./src/serve.ts",
+    "start:debug": "nodemon --watch ./src --ext ts --exec node --inspect=0.0.0.0:9229 -r ts-node/register ./src/serve.ts",
     "clean": "rimraf ./dist",
     "build": "npm run clean & tsc --project ./tsconfig.build.json",
-    "start": "node dist/serve.js",
+    "start": "node ./dist/serve.js",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
@@ -164,8 +169,8 @@ serve();
   "keywords": ["avleon","nodejs","typescript"],
   "license": "ISC",
   "dependencies": {
-    "@avleon/core": "^0.0.28",
-    "@avleon/cli": "^0.0.35",
+    "@avleon/core": "^0.0.29",
+    "@avleon/cli": "^0.0.37",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "reflect-metadata": "^0.2.2"
@@ -247,16 +252,13 @@ serve();
   );
   // create basic service
   // create basic controller
-  console.info("App created successfully. Run the following command to get start.");
+  // console.info("App created successfully. Run the following command to get start.");
   //  console.log(`cd ${fname} && ${pm} install`);
   // console.log(pm == 'npm' ? `npm run start:dev` : `${pm} start:dev`);
   try {
     console.log(`Running ${pm} install...`);
     await execAsync(`cd ${fname}`);
     await installDependencies(pm, fname);
-    console.log(`cd ${fname}`);
-    console.log(pm == 'npm' ? `npm run start:dev` : `${pm} start:dev`);
-    console.log('✅ Dependencies installed successfully.');
   } catch (error) {
     console.error('❌ Installation failed:', error);
   }
