@@ -169,8 +169,8 @@ start();
   "keywords": ["avleon","nodejs","typescript"],
   "license": "ISC",
   "dependencies": {
-    "@avleon/core": "^0.0.29",
-    "@avleon/cli": "^0.0.37",
+    "@avleon/core": "^0.0.30",
+    "@avleon/cli": "^0.0.38",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "reflect-metadata": "^0.2.2"
