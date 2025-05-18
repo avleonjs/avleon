@@ -30,19 +30,43 @@ async function askForPackageManager(): Promise<'npm' | 'yarn' | 'pnpm'> {
 async function createApplication(fname: any, flags: any = {}) {
   let appPaths = getAppPaths(fname);
   const pm = await askForPackageManager();
-  const dirs = Object.values(appPaths);
-  for (let i = 0; i < dirs.length; i++) {
-    await fs.ensureDir(dirs[i]);
-  }
+  // const dirs = Object.values(appPaths);
+  // for (let i = 0; i < dirs.length; i++) {
+  //   await fs.ensureDir(dirs[i]);
+  // }
 
+  await fs.ensureDir(appPaths.root + "/src");
+  await fs.ensureDir(appPaths.root + "/test");
   await fs.ensureDir(appPaths.root + "/public");
   // copy
-  //
+    // home controller
+  const homeContrlelr = `
+import { ApiController, Get } from "@avleon/core";
+
+
+@ApiController
+export class HomeController{
+
+  @Get()
+  sayHello(){
+    return "Hello World!";
+  }
+}
+`;
+
+  const formatHomeController = await prettier.format(homeContrlelr, {
+    singleQuote: true,
+    singleAttributePerLine: true,
+    parser: "typescript",
+  });
+
+  await fs.writeFile(path.join(appPaths.src, "home.controller.ts"), formatHomeController);
+  // main file 
   const mainFunc = `
 import {
   Avleon
 } from "@avleon/core";
-import {HomeController} from './controllers/home.controller';
+import { HomeController } from './home.controller';
 
 
 const app = Avleon.createApplication();
@@ -66,6 +90,7 @@ export default app;
   });
 
   await fs.writeFile(path.join(appPaths.src, "app.ts"), formatMainFunc);
+
 
 
 
@@ -114,8 +139,8 @@ serve();
   "keywords": ["avleon","nodejs","typescript"],
   "license": "ISC",
   "dependencies": {
-    "@avleon/core": "^0.0.27",
-    "@avleon/cli": "^0.0.32",
+    "@avleon/core": "^0.0.28",
+    "@avleon/cli": "^0.0.34",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "reflect-metadata": "^0.2.2"
@@ -204,6 +229,8 @@ serve();
     console.log(`Running ${pm} install...`);
     await execAsync(`cd ${fname}`);
     await execAsync(`${pm} install`, { cwd: fname, shell: getShell() });
+    console.log(`cd ${fname} && ${pm} install`);
+    console.log(pm == 'npm' ? `npm run start:dev` : `${pm} start:dev`);
     console.log('✅ Dependencies installed successfully.');
   } catch (error) {
     console.error('❌ Installation failed:', error);
