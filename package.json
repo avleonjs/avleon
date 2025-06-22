@@ -1,6 +1,6 @@
 {
   "name": "@avleon/cli",
-  "version": "0.0.38",
+  "version": "0.0.39",
   "bin": {
     "avleon": "./dist/cli.js"
   },

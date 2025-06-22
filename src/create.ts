@@ -1,11 +1,12 @@
 import fs from "fs-extra";
 import { appPathsMinimal, appPaths as getAppPaths } from "./paths";
 import * as prettier from "prettier";
-import path from "path/win32";
+import path from "path";
 import os from 'os';
 import inquirer from 'inquirer';
 import { exec, spawn } from 'child_process';
 import util from 'util';
+import { capitalize } from "lodash";
 
 const execAsync = util.promisify(exec);
 const getShell = () => {
@@ -33,7 +34,7 @@ async function installDependencies(pm: string, fname: string): Promise<void> {
     const child = spawn(pm, ['install'], {
       cwd: fname,
       shell: getShell(),
-      stdio: 'inherit', 
+      stdio: 'inherit',
     });
 
     child.on('exit', (code) => {
@@ -64,12 +65,13 @@ async function createApplication(fname: any, flags: any = {}) {
 
   await fs.ensureDir(appPaths.root + "/src");
   await fs.ensureDir(appPaths.root + "/src/controllers");
+  await fs.ensureDir(appPaths.root + "/src/config");
   await fs.ensureDir(appPaths.root + "/src/services");
   await fs.ensureDir(appPaths.root + "/src/models");
   await fs.ensureDir(appPaths.root + "/test");
   await fs.ensureDir(appPaths.root + "/public");
   // copy
-    // home controller
+  // home controller
   const homeContrlelr = `
 import { ApiController, Get } from "@avleon/core";
 
@@ -90,22 +92,46 @@ export class HomeController{
     parser: "typescript",
   });
 
-  await fs.writeFile(path.join(appPaths.src, "home.controller.ts"), formatHomeController);
+  await fs.writeFile(path.join(appPaths.controllers, "home.controller.ts"), formatHomeController);
+
+// openapi config file
+  const openapiConfigFile = `
+import { AppConfig, Environment, IConfig } from "@avleon/core";
+
+@AppConfig
+export class OpenApiConfig implements IConfig {
+
+    config(env: Environment) {
+        return {
+            info: {
+                title: '${capitalize(fname)}',
+                version: '0.0.1',
+            },
+        }
+    }
+}
+`;
+
+  const formatConfigFile = await prettier.format(openapiConfigFile, {
+    singleQuote: true,
+    singleAttributePerLine: true,
+    parser: "typescript",
+  });
+
+  await fs.writeFile(path.join(appPaths.configs, "openapi.config.ts"), formatConfigFile);
+
   // main file 
   const mainFunc = `
-import {
-  Avleon
-} from "@avleon/core";
-import { HomeController } from './home.controller';
+import { Avleon } from '@avleon/core';
+import { OpenApiConfig } from './config/openapi.config';
+import { HomeController } from './controllers/home.controller';
 
 
 const app = Avleon.createApplication();
-app.useOpenApi({
-  info:{
-    title: '${fname} Api',
-    version: '0.0.1'
-  }
-});
+
+if(app.isDevelopemtn()){
+  app.useOpenApi(OpenApiConfig);
+}
 
 app.useControllers([ HomeController ]);
 app.useStaticFiles();
@@ -123,14 +149,13 @@ export default app;
 
 
 
-
-
   // create serve.ts 
-const serveFunc = `
+  const serveFunc = `
 import app from "./app";
+import { capitalize } from "lodash";
 
 async function start(){
-  app.run();
+  app.run(); // default run on :4000
 }
 
 start();
@@ -143,9 +168,6 @@ start();
   });
 
   await fs.writeFile(path.join(appPaths.src, "serve.ts"), formatServeFunc);
-
-
-
 
   // create package.json
   const packageJson = `
@@ -169,8 +191,8 @@ start();
   "keywords": ["avleon","nodejs","typescript"],
   "license": "ISC",
   "dependencies": {
-    "@avleon/core": "^0.0.30",
-    "@avleon/cli": "^0.0.38",
+    "@avleon/core": "^0.0.36",
+    "@avleon/cli": "^0.0.40",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "reflect-metadata": "^0.2.2"
@@ -225,6 +247,16 @@ start();
   );
   await fs.writeFile(path.join(appPaths.root, "tsconfig.json"), tsconfigJson);
 
+  const tsconfigBuildJson = await prettier.format(
+    `{
+  "extends": "./tsconfig.json",
+  "exclude": ["node_modules","coverage", "test", "dist", "**/*spec.ts"]
+}
+`,
+    { parser: "json" }
+  );
+  await fs.writeFile(path.join(appPaths.root, "tsconfig.build.json"), tsconfigBuildJson);
+
 
   // write e2e-test.json
   const e2eJson = await prettier.format(
@@ -250,11 +282,6 @@ start();
     path.join(appPaths.root, ".gitignore"),
     `node_modules/\ndist/\n.env`
   );
-  // create basic service
-  // create basic controller
-  // console.info("App created successfully. Run the following command to get start.");
-  //  console.log(`cd ${fname} && ${pm} install`);
-  // console.log(pm == 'npm' ? `npm run start:dev` : `${pm} start:dev`);
   try {
     console.log(`Running ${pm} install...`);
     await execAsync(`cd ${fname}`);
