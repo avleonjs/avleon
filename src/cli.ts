@@ -10,6 +10,7 @@ import { commandList } from "./commands";
 import { exec, execSync } from "child_process";
 import { createApplication } from "./create";
 import { createService } from "./service";
+import { capitalize } from "lodash";
 
 export function iqraCli() { }
 
@@ -195,8 +196,9 @@ async function createConfig(name: string, options = { force: false }) {
     );
   }
   const modelName = name.at(0).toUpperCase() + name.slice(1);
+  const modelClassName = capitalize(modelName).endsWith('Config')? capitalize(modelName) :capitalize(modelName)+"Config"
   const modelExists = existsSync(
-    path.join(process.cwd(), `./src/cinfigs/${modelName.toLowerCase()}.ts`),
+    path.join(process.cwd(), `./src/config/${modelName.toLowerCase()}.ts`),
   );
 
   if (modelExists && !options.force) {
@@ -205,10 +207,10 @@ async function createConfig(name: string, options = { force: false }) {
   }
 
   const modelFolderExists = existsSync(
-    path.join(process.cwd(), "./src/configs"),
+    path.join(process.cwd(), "./src/config"),
   );
   if (!modelFolderExists) {
-    await fs.mkdir(path.join(process.cwd(), "./src/configs"), {
+    await fs.mkdir(path.join(process.cwd(), "./src/config"), {
       recursive: true,
     });
   }
@@ -218,7 +220,7 @@ async function createConfig(name: string, options = { force: false }) {
 import { Config, IConfig } from '@avleon/core';
 
 @AppConfig
-export class ${modelName}Middleware implements IConfig<T>{
+export class ${modelClassName} implements IConfig<T>{
 
     config(env: Environment){
       // config must return config
@@ -237,11 +239,11 @@ export class ${modelName}Middleware implements IConfig<T>{
   });
 
   await fs.writeFile(
-    path.join(process.cwd(), "./src/middlewares/" + modelName.toLowerCase() + ".ts"),
+    path.join(process.cwd(), "./src/config/" + modelName.toLowerCase() + ".ts"),
     formatModel,
   );
 
-  console.log("Middleware created succssessfully!");
+  console.log("Config created succssessfully!");
 }
 
 

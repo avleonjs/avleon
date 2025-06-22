@@ -6,7 +6,7 @@ import os from 'os';
 import inquirer from 'inquirer';
 import { exec, spawn } from 'child_process';
 import util from 'util';
-import { capitalize } from "lodash";
+import { capitalize, snakeCase } from "lodash";
 
 const execAsync = util.promisify(exec);
 const getShell = () => {
@@ -71,17 +71,46 @@ async function createApplication(fname: any, flags: any = {}) {
   await fs.ensureDir(appPaths.root + "/test");
   await fs.ensureDir(appPaths.root + "/public");
   // copy
+
+  // home controller
+  const homeService = `
+import { AppService } from '@avleon/core';
+
+
+@AppService
+export class HomeService{
+
+  sayHello(){
+    return "Hello World!";
+  }
+}
+`;
+
+  const formatHomeService= await prettier.format(homeService, {
+    singleQuote: true,
+    singleAttributePerLine: true,
+    parser: "typescript",
+  });
+
+  await fs.writeFile(path.join(appPaths.services, "home.service.ts"), formatHomeService);
+
+
   // home controller
   const homeContrlelr = `
-import { ApiController, Get } from "@avleon/core";
+import { ApiController, Get } from '@avleon/core';
+import { HomeService } from '../services/home.service';
 
 
 @ApiController
 export class HomeController{
 
+  constructor(
+    private readonly homeService: HomeService
+  ){}
+
   @Get()
   sayHello(){
-    return "Hello World!";
+    return this.homeService.sayHello();
   }
 }
 `;
@@ -152,7 +181,6 @@ export default app;
   // create serve.ts 
   const serveFunc = `
 import app from "./app";
-import { capitalize } from "lodash";
 
 async function start(){
   app.run(); // default run on :4000
@@ -172,10 +200,10 @@ start();
   // create package.json
   const packageJson = `
 {
-  "name": "${fname}",
+  "name": "${snakeCase(fname)}",
   "version": "0.0.1",
   "description": "Basic avleon application",
-  "main": "index.js",
+  "main": "dist/serve.js",
   "scripts": {
     "start:dev": "nodemon ./src/serve.ts",
     "start:debug": "nodemon --watch ./src --ext ts --exec node --inspect=0.0.0.0:9229 -r ts-node/register ./src/serve.ts",
@@ -192,13 +220,15 @@ start();
   "license": "ISC",
   "dependencies": {
     "@avleon/core": "^0.0.36",
-    "@avleon/cli": "^0.0.40",
+    "@avleon/cli": "^0.0.42",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
+    "rimraf": "^6.0.1",
     "reflect-metadata": "^0.2.2"
   },
   "devDependencies": {
     "@types/jest": "^29.5.14",
+    "@types/node": "^24.0.3",
     "jest": "^29.7.0",
     "ts-jest": "^29.2.6",
     "nodemon": "^3.1.7",

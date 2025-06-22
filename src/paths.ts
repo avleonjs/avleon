@@ -38,6 +38,6 @@ export const appPaths = (rootPath?: string): AppPaths => {
     models: path.join(root, "src/models"),
     services: path.join(root, "src/services"),
     dtos: path.join(root, "src/dtos"),
-    configs: path.join(root, "src/configs")
+    configs: path.join(root, "src/config")
   }
 }
