@@ -123,6 +123,50 @@ export class HomeController{
 
   await fs.writeFile(path.join(appPaths.controllers, "home.controller.ts"), formatHomeController);
 
+
+  const homeContrlelrTest = `
+import { AvleonTest } from "@avleon/core";
+import { HomeController } from "./home.controller"
+
+describe('Home Controller', () => {
+    let controller!: HomeController;
+
+    beforeAll(()=>{
+        controller = AvleonTest.getController(HomeController);
+    })
+
+    it('should be defined', () => {
+        expect(controller).toBeDefined()
+    })
+
+    it('should have sayhello function', () => {
+        expect(controller.sayHello).toBeDefined
+    })
+
+    it('should return sayhello', () => {
+        expect(controller.sayHello()).toBe("Hello World!");
+    })
+})
+`;
+
+  const formatHomeControllerTest = await prettier.format(homeContrlelrTest, {
+    singleQuote: true,
+    singleAttributePerLine: true,
+    parser: "typescript",
+  });
+
+  await fs.writeFile(path.join(appPaths.controllers, "home.controller.spec.ts"), formatHomeControllerTest);
+
+
+
+
+
+
+
+
+
+
+
 // openapi config file
   const openapiConfigFile = `
 import { AppConfig, Environment, IConfig } from "@avleon/core";
@@ -158,7 +202,7 @@ import { HomeController } from './controllers/home.controller';
 
 const app = Avleon.createApplication();
 
-if(app.isDevelopemtn()){
+if(app.isDevelopment()){
   app.useOpenApi(OpenApiConfig);
 }
 
@@ -238,7 +282,7 @@ start();
     "jest": {
     "preset": "ts-jest",
     "rootDir": "src",
-    "testRegex": ".*/\/\.spec/\/\.ts$",
+    "testRegex": ".*.spec.ts$",
     "collectCoverageFrom": [
       "**/*.(t|j)s"
     ],
