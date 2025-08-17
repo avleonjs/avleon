@@ -40,5 +40,8 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/avleonjs/avleon-cli"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
