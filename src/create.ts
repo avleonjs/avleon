@@ -67,7 +67,7 @@ async function createApplication(fname: any, flags: any = {}) {
   await fs.ensureDir(appPaths.root + "/src/controllers");
   await fs.ensureDir(appPaths.root + "/src/config");
   await fs.ensureDir(appPaths.root + "/src/services");
-  await fs.ensureDir(appPaths.root + "/src/models");
+  // await fs.ensureDir(appPaths.root + "/src/models");
   await fs.ensureDir(appPaths.root + "/test");
   await fs.ensureDir(appPaths.root + "/public");
   // copy

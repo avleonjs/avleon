@@ -1,6 +1,6 @@
 {
   "name": "@avleon/cli",
-  "version": "0.0.43",
+  "version": "0.0.44",
   "bin": {
     "avleon": "./dist/cli.js"
   },
@@ -20,9 +20,13 @@
   "author": "Tareq Hossain",
   "license": "ISC",
   "devDependencies": {
+    "@swc/cli": "^0.7.8",
+    "@swc/core": "^1.13.5",
     "@types/fs-extra": "^11.0.4",
     "@types/lodash": "^4.17.16",
     "@types/node": "^22.9.3",
+    "chokidar": "^4.0.3",
+    "concurrently": "^9.2.1",
     "nodemon": "^3.1.7",
     "tsc-watch": "^6.2.1",
     "tsup": "^8.4.0",

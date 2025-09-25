@@ -251,6 +251,13 @@ export class ${modelClassName} implements IConfig<T>{
 export async function run() {
   try {
     const args = process.argv.slice(2);
+
+    if(args[0] == "serve"){
+      require('./serve')
+
+      return;
+    }
+
     if (args.length < 1) {
       await displayCommandList({ logo: true, all: false });
     } else {
