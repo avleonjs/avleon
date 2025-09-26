@@ -217,7 +217,7 @@ async function createConfig(name: string, options = { force: false }) {
 
   const basicMiddleware = `
       \t
-import { Config, IConfig } from '@avleon/core';
+import { AppConfig, IConfig } from '@avleon/core';
 
 @AppConfig
 export class ${modelClassName} implements IConfig<T>{

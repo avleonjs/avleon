@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@swc/core':
+        specifier: ^1.13.5
+        version: 1.13.5
       chalk:
         specifier: ^5.4.1
         version: 5.4.1
@@ -33,9 +36,6 @@ importers:
       '@swc/cli':
         specifier: ^0.7.8
         version: 0.7.8(@swc/core@1.13.5)(chokidar@4.0.3)
-      '@swc/core':
-        specifier: ^1.13.5
-        version: 1.13.5
       '@types/fs-extra':
         specifier: ^11.0.4
         version: 11.0.4

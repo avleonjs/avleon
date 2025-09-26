@@ -21,7 +21,6 @@
   "license": "ISC",
   "devDependencies": {
     "@swc/cli": "^0.7.8",
-    "@swc/core": "^1.13.5",
     "@types/fs-extra": "^11.0.4",
     "@types/lodash": "^4.17.16",
     "@types/node": "^22.9.3",
@@ -34,6 +33,7 @@
   },
   "dependencies": {
     "chalk": "^5.4.1",
+        "@swc/core": "^1.13.5",
     "cli-table3": "^0.6.5",
     "fs-extra": "^11.2.0",
     "inquirer": "^12.6.0",
