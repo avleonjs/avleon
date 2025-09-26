@@ -33,7 +33,7 @@
   },
   "dependencies": {
     "chalk": "^5.4.1",
-        "@swc/core": "^1.13.5",
+    "@swc/core": "^1.13.5",
     "cli-table3": "^0.6.5",
     "fs-extra": "^11.2.0",
     "inquirer": "^12.6.0",
