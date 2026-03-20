@@ -1,45 +1,55 @@
 {
   "name": "@avleon/cli",
   "version": "0.0.44",
+  "description": "CLI for scaffolding and running Avleon applications",
+  "author": "Tareq Hossain",
+  "license": "ISC",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "bin": {
     "avleon": "./dist/cli.js"
   },
-  "description": "",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "scripts": {
-    "build": "rimraf dist & tsc",
-    "clean": "rm -rf ./dist",
-    "prepublish": "npm run build",
-    "watch": "tsc-watch"
+    "build": "rimraf dist && tsc",
+    "clean": "rimraf dist",
+    "prepublishOnly": "npm run build",
+    "watch": "tsc-watch --onSuccess \"echo Build complete\""
   },
   "keywords": [
     "cli",
-    "backend-api"
+    "avleon",
+    "backend",
+    "typescript"
   ],
-  "author": "Tareq Hossain",
-  "license": "ISC",
-  "devDependencies": {
-    "@swc/cli": "^0.7.8",
-    "@types/fs-extra": "^11.0.4",
-    "@types/lodash": "^4.17.16",
-    "@types/node": "^22.9.3",
-    "chokidar": "^4.0.3",
-    "concurrently": "^9.2.1",
-    "nodemon": "^3.1.7",
-    "tsc-watch": "^6.2.1",
-    "tsup": "^8.4.0",
-    "typescript": "^5.7.2"
-  },
   "dependencies": {
-    "chalk": "^5.4.1",
+    "@avleon/core": "*",
     "@swc/core": "^1.13.5",
+    "chokidar": "^4.0.3",
+    "chalk": "^5.4.1",
     "cli-table3": "^0.6.5",
     "fs-extra": "^11.2.0",
     "inquirer": "^12.6.0",
     "lodash": "^4.17.21",
     "prettier": "^3.3.3",
     "rimraf": "^6.0.1"
+  },
+  "devDependencies": {
+    "@swc/cli": "^0.7.8",
+    "@types/fs-extra": "^11.0.4",
+    "@types/lodash": "^4.17.16",
+    "@types/node": "^22.9.3",
+    "concurrently": "^9.2.1",
+    "nodemon": "^3.1.7",
+    "tsc-watch": "^6.2.1",
+    "tsup": "^8.4.0",
+    "typescript": "^5.7.2"
+  },
+  "peerDependencies": {
+    "@avleon/core": ">=0.0.38"
   },
   "repository": {
     "type": "git",

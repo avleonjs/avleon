@@ -7,7 +7,12 @@ const { transformFileSync } = require("@swc/core");
 
 const SRC_DIR = path.resolve(process.cwd(), "./src");
 const DIST_DIR = path.resolve(process.cwd(), "./dist");
-const ENTRY_FILE = path.join(DIST_DIR, "server.js");
+const pkg = fs.existsSync(path.join(process.cwd(), "package.json"))
+    ? JSON.parse(fs.readFileSync(path.join(process.cwd(), "package.json"), "utf8"))
+    : {};
+
+const ENTRY_RELATIVE = pkg?.avleon?.entry || pkg?.main?.replace("src/", "dist/").replace(".ts", ".js") || "dist/server.js";
+const ENTRY_FILE = path.resolve(process.cwd(), ENTRY_RELATIVE);
 
 let nodeProcess = null;
 let isRestarting = false;
@@ -170,14 +175,7 @@ function startNode() {
       nodeProcess = null;
       isRestarting = false;
     });
-    
-    // Add a small delay to let the server start
-    setTimeout(() => {
-      if (nodeProcess) {
-        logServer("✅ Server started successfully");
-      }
-    }, 500);
-    
+
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     logError('AVLEON', `Failed to start server: ${errorMessage}`);
@@ -264,7 +262,15 @@ async function restartNode() {
     isRestarting = false;
   }
 }
+let restartTimer = null;
 
+async function debouncedRestart() {
+    if (restartTimer) clearTimeout(restartTimer);
+    restartTimer = setTimeout(async () => {
+        restartTimer = null;
+        await restartNode();
+    }, 300); // wait 300ms after last change
+}
 // watch src
 function watch() {
 
@@ -282,10 +288,7 @@ function watch() {
     }
   });
   
-  // Debug: log when watcher is ready
-//   watcher.on('ready', () => {
-//     logWatch('✅ Initial scan complete. Ready for changes');
-//   });
+
   
   watcher.on("add", (file: string) => {
     
@@ -298,9 +301,9 @@ function watch() {
   
   watcher.on("change", async (file: string) => {
     if (file.endsWith('.ts') && !isTestFile(file)) {
-      if (compileFile(file)) {
-        await restartNode();
-      }
+        if (compileFile(file)) {
+            await debouncedRestart();
+        }
     }
   });
   
@@ -327,7 +330,14 @@ function watch() {
     logError('WATCH', `Watcher error: ${error.message}`);
   });
 }
+process.on("uncaughtException", (error) => {
+    logError('CLI', `Uncaught exception: ${error.message}`);
+    logError('CLI', error.stack ?? "");
+});
 
+process.on("unhandledRejection", (reason) => {
+    logError('CLI', `Unhandled rejection: ${reason}`);
+});
 // Graceful shutdown
 process.on("SIGINT", async () => {
 
@@ -335,10 +345,6 @@ process.on("SIGINT", async () => {
   process.exit(0);
 });
 
-process.on("SIGTERM", async () => {
-  await killNode();
-  process.exit(0);
-});
 
 // Main execution
 (async () => {

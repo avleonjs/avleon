@@ -196,7 +196,7 @@ async function createConfig(name: string, options = { force: false }) {
     );
   }
   const modelName = name.at(0).toUpperCase() + name.slice(1);
-  const modelClassName = capitalize(modelName).endsWith('Config')? capitalize(modelName) :capitalize(modelName)+"Config"
+  const modelClassName = capitalize(modelName).endsWith('Config') ? capitalize(modelName) : capitalize(modelName) + "Config"
   const modelExists = existsSync(
     path.join(process.cwd(), `./src/config/${modelName.toLowerCase()}.ts`),
   );
@@ -252,7 +252,7 @@ export async function run() {
   try {
     const args = process.argv.slice(2);
 
-    if(args[0] == "serve"){
+    if (args[0] == "serve") {
       require('./serve')
 
       return;
