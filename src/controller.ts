@@ -38,13 +38,13 @@ function exportNamesAndPath(input: string): {
 
 const controllersStubs = {
   basic: pathHelper.stubPath('controllers/basic-controller.stub'),
-  rest: pathHelper.stubPath('controllers/basic-controller.stub'),
+  rest: pathHelper.stubPath('controllers/rest-controller.stub'),
   ormRest: pathHelper.stubPath('controllers/orm-rest-controller.stub')
 }
 
 async function createController(
   name: string,
-  options = { force: false, resource: false, prefix: true, rest: false, model: null, root: null },
+  options = { force: false, resource: false, prefix: true, rest: false, model: null, root: null, orm: false },
   p?: string
 ) {
   if (!name) {
@@ -54,22 +54,20 @@ async function createController(
   }
 
   // determine stub for generate
+  // A model means the controller can delegate to a generated service; without
+  // one there is nothing to call, so emit the unimplemented REST skeleton.
   let stubPath = controllersStubs.basic;
-  if (options.rest) {
-    stubPath = controllersStubs.rest;
-    if (options.model) {
-      stubPath = controllersStubs.ormRest;
-    }
+  if (options.rest || options.resource) {
+    stubPath = options.model ? controllersStubs.ormRest : controllersStubs.rest;
   }
 
   // determine root path for create controller file 
   const rootPath = options.root ? 'src/' + options.root + '/' : 'src/controllers/';
 
-  // ensure file create directory exits 
-  if (name.split("/").length > 1) {
-    if (!existsSync(path.join(rootPath, name.split("/").splice(-1, 1).join("/")))) {
-      await fs.mkdir(path.join(rootPath, name.replace('/' + fh.filenameFromPath(name), '')), { recursive: true })
-    }
+  // ensure the output directory exists
+  const outDir = path.join(rootPath, getFilePathWithoutName(name));
+  if (!existsSync(outDir)) {
+    await fs.mkdir(outDir, { recursive: true })
   }
 
   // read stub content from stub file
@@ -80,7 +78,7 @@ async function createController(
   const className = names.className.replace("Controller", '');
 
   if (options.model) {
-    await createRestService(className, options.model);
+    await createRestService(className, options.model, options.orm);
   }
 
   let replacedContent = content
@@ -96,20 +94,27 @@ async function createController(
     replacedContent = replacedContent.replace(/@ApiController\s*\(([^)]*)\)/g, '@ApiController');
   }
 
-  await fs.writeFile(path.join(rootPath, getFilePathWithoutName(name) + "/" + kebabCase(className) + '.controller.ts'), replacedContent, 'utf8');
-  console.log("Controller created succssessfully!");
+  await fs.writeFile(path.join(outDir, kebabCase(className) + '.controller.ts'), replacedContent, 'utf8');
+  console.log("Controller created successfully!");
 }
 
 async function createRestService(
   name: string,
-  model?: string
+  model?: string,
+  orm = false,
 ) {
 
-  let stubPath = pathHelper.stubPath('services/rest-service.stub');
+  const stubPath = pathHelper.stubPath(
+    orm ? 'services/orm-rest-service.stub' : 'services/rest-service.stub',
+  );
   const content = await fs.readFile(stubPath, 'utf8')
-  const names = resolveNames(fh.filenameFromPath(name), 'Controller');
+
+  // The generated controller imports `{Model}Service` from
+  // `../services/{model}.service`, so the file must be named after the model.
+  const serviceName = model ? capitalize(model) : name;
+
   let replacedContent = content
-    .replaceAll('{Service}', name);
+    .replaceAll('{Service}', serviceName);
 
   if (model) {
     replacedContent = replacedContent
@@ -117,8 +122,12 @@ async function createRestService(
       .replaceAll('{model}', lower(model));
   }
 
+  const serviceDir = path.join('src', 'services');
+  if (!existsSync(serviceDir)) {
+    await fs.mkdir(serviceDir, { recursive: true });
+  }
 
-  await fs.writeFile(path.join('src/services/', kebabCase(name) + '.service.ts'), replacedContent, 'utf8');
-  console.log("Service created succssessfully!");
+  await fs.writeFile(path.join(serviceDir, lower(serviceName) + '.service.ts'), replacedContent, 'utf8');
+  console.log("Service created successfully!");
 }
 export { createController };

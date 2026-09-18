@@ -15,13 +15,13 @@ function lower(str: string) {
 
 const servicesStubs = {
   basic: pathHelper.stubPath('services/basic-service.stub'),
-  rest: pathHelper.stubPath('services/basic-service.stub'),
+  rest: pathHelper.stubPath('services/rest-service.stub'),
   ormRest: pathHelper.stubPath('services/orm-rest-service.stub')
 }
 
 async function createService(
   name: string,
-  options = { force: false, resource: false, prefix: true, rest: false, model: null, root: null },
+  options = { force: false, resource: false, prefix: true, rest: false, model: null, root: null, orm: false },
   p?: string
 ) {
   if (!name) {
@@ -35,18 +35,14 @@ async function createService(
 
   // determine stub for generate
   let stubPath = servicesStubs.basic;
-  if (options.rest) {
-    stubPath = servicesStubs.rest;
-    if (options.model) {
-      stubPath = servicesStubs.ormRest;
-    }
+  if (options.rest || options.resource) {
+    stubPath = options.orm ? servicesStubs.ormRest : servicesStubs.rest;
   }
 
   const rootPath = options.root ? 'src/' + options.root + '/' : 'src/services/';
-  if (name.split("/").length > 1) {
-    if (!existsSync(path.join(rootPath, name.split("/").splice(-1, 1).join("/")))) {
-      await fs.mkdir(path.join(rootPath, name.replace('/' + fh.filenameFromPath(name), '')), { recursive: true })
-    }
+  const outDir = path.join(rootPath, getFilePathWithoutName(name));
+  if (!existsSync(outDir)) {
+    await fs.mkdir(outDir, { recursive: true })
   }
   const content = await fs.readFile(stubPath, 'utf8')
   const names = resolveNames(fh.filenameFromPath(name), 'Service');
@@ -61,8 +57,8 @@ async function createService(
       .replaceAll('{model}', lower(options.model));
   }
 
-  await fs.writeFile(path.join(rootPath, getFilePathWithoutName(name) + "/" + kebabCase(className) + '.service.ts'), replacedContent, 'utf8');
-  console.log("Service created succssessfully!");
+  await fs.writeFile(path.join(outDir, kebabCase(className) + '.service.ts'), replacedContent, 'utf8');
+  console.log("Service created successfully!");
 }
 
 async function createRestService(

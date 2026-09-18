@@ -1,4 +1,3 @@
-
 ### ⚠️ WARNING: NOT FOR PRODUCTION USE
 
 > **🚧 This project is in active development.**
@@ -6,7 +5,7 @@
 > It is **not stable** and **not ready** for live environments.  
 > Use **only for testing, experimentation, or internal evaluation**.
 >
-> ####❗ Risks of using this in production:
+> #### ❗ Risks of using this in production:
 >
 > - 🔄 Breaking changes may be introduced at any time
 > - 🧪 Features are experimental and may be unstable
@@ -15,52 +14,103 @@
 >
 > **Please do not deploy this in production environments.**
 
-# Avleon CLI - v0.0.37
+# Avleon CLI
 
-### Create Application
+Scaffold and run [Avleon](https://github.com/avleonjs/avleon-core) applications.
+
+## Create an Application
+
 ```sh
 npx @avleon/cli new my_api
 ```
-### Create Controller 
+
+You are prompted for a package manager and for optional features (OpenAPI,
+CORS, TypeORM, Knex, Scalar UI). The generated project uses `@avleon/core`'s
+`Avleon.createApplication()` and is ready to run:
+
 ```sh
-npx avleon make:controller product
-# or shorthand
-npx avleon m:c product
-# for resource controller with -r flag
-npx avleon m:c product -m product -r
+cd my_api
+npm run start:dev
 ```
 
-### Create Model/Entity
+## Commands
+
+| Command | Alias | Options | Description |
+|---------|-------|---------|-------------|
+| `new` | | `--minimal`, `-m` | Create a new application |
+| `serve` | | | Start the dev server with watch + rebuild |
+| `build` | | | Compile with `tsconfig.build.json` |
+| `make:model` | `m:m` | `-f`, `--orm` | Create a model / TypeORM entity |
+| `make:controller` | `m:c` | `-f`, `-r`, `-m <model>`, `-rt <dir>`, `--orm`, `--base-path` | Create a controller |
+| `make:service` | `m:s` | `-f`, `-r`, `-m <model>`, `-rt <dir>`, `--orm` | Create a service |
+| `make:config` | `m:cnf` | `-f` | Create a config class |
+| `make:middleware` | `m:mlwr` | `-f` | Create a middleware |
+
+`-f` / `--force` overwrites an existing file. `-r` / `--resource` generates a
+full REST skeleton.
+
+### Controller
+
 ```sh
-# basic model
+npx avleon make:controller product
+# shorthand
+npx avleon m:c product
+
+# REST controller — also generates the matching service
+npx avleon m:c product -m product -r
+
+# REST controller backed by a TypeORM repository
+npx avleon m:c product -m product -r --orm
+```
+
+With `-m`, the generated controller delegates to `src/services/<model>.service.ts`,
+which is created alongside it.
+
+### Model / Entity
+
+```sh
+# plain class
 npx avleon make:model product
-# typeorm model
+
+# TypeORM entity
 npx avleon m:m product --orm
 ```
 
-### Create Service
+### Service
+
 ```sh
 # basic service
 npx avleon make:service product
-# resource service with built-in collection
+
+# resource service backed by an in-memory Collection
 npx avleon make:service product -m product -r
-# resource service with typeorm collection
+
+# resource service backed by a TypeORM repository
 npx avleon make:service product -m product -r --orm
 ```
 
-### Create Middleware
+### Middleware
+
 ```sh
-npx avleon make:config product
+npx avleon make:middleware auth
 ```
 
-### Create Config
+Generates a class extending `AvleonMiddleware` with an `invoke(req, res)` method.
+
+### Config
+
 ```sh
-npx avleon make:config product
+npx avleon make:config jwt
 ```
 
-### Create authoriztion (Experimental)
+Generates a class extending `AvleonConfig`, registered via `@AppConfig`.
+
+## Development Server
+
 ```sh
-npx avleon make:auth jwt
+npx avleon serve
 ```
 
-
+Compiles `src/` with SWC into `dist/`, starts the entry point, and restarts on
+change. The entry file is taken from `avleon.entry` in `package.json`, falling
+back to `main`.

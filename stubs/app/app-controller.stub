@@ -1,11 +1,13 @@
-import { Builder, AppConfig } from '@avleon/core';
+import { Avleon } from '@avleon/core';
+import { OpenApiConfig } from './config/openapi.config';
 import { HomeController } from './controllers/home.controller';
 
-const builder = Builder.createAppBuilder();
+const app = Avleon.createApplication();
 
-const app = builder.build();
-app.useOpenApi((config:AppConfig)=> config.openApi);
+if (app.isDevelopment()) {
+  app.useOpenApi(OpenApiConfig);
+}
+
 app.useControllers([HomeController]);
 
-
-app.run();
+export default app;

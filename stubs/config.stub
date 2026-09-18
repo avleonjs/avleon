@@ -1,11 +1,15 @@
-@Config
-export class OpenApiConfig {
-  config() {
+import { AppConfig, AvleonConfig, Environment, OpenApiUiOptions } from '@avleon/core';
+
+@AppConfig
+export class OpenApiConfig extends AvleonConfig<OpenApiUiOptions> {
+  config(env: Environment): OpenApiUiOptions {
     return {
-      title: 'My API',
-      version: '1.0.0',
-      description: 'API documentation',
-      path: '/api-docs',
+      info: {
+        title: 'My API',
+        version: '1.0.0',
+        description: 'API documentation',
+      },
+      routePrefix: '/docs',
     };
   }
 }
