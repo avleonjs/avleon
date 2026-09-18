@@ -2,14 +2,15 @@
   "compilerOptions": {
     "target": "ES2022",
     "module": "CommonJS",
-    "moduleResolution": "node",
+
     "outDir": "./dist",
     "rootDir": "./src",
     "allowJs": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "types": ["node", "jest"]
   },
   "include": ["src/**/*", "stubs", "scripts"],
   "exclude": ["node_modules", "dist", "src/**/*.(spec|test).ts"]
