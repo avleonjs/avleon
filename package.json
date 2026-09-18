@@ -1,6 +1,6 @@
 {
   "name": "@avleon/cli",
-  "version": "0.0.46",
+  "version": "0.0.47",
   "description": "CLI for scaffolding and running Avleon applications",
   "author": "Tareq Hossain",
   "license": "ISC",
