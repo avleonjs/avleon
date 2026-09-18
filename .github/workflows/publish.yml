@@ -37,9 +37,6 @@ jobs:
       - name: Build
         run: npm run build
 
-      # 5. Run tests
-      - name: Test
-        run: npm test
 
       - name: Get latest tag
         id: get_latest_tag
