@@ -1379,9 +1379,9 @@ for 2.0. These lists track what has landed and what still blocks 1.0.0.
 
 **Packaging and tooling**
 
-- [x] CommonJS-only build with an `exports` map and `sideEffects` ([module format](docs/module-format.md))
+- [x] CommonJS-only build with an `exports` map and `sideEffects`
 - [x] Integrations moved to optional peer dependencies
-- [x] Keep typedi behind `AvleonContainer` for 1.0 ([ADR 001](docs/adr-001-typedi.md))
+- [x] Keep typedi behind `AvleonContainer` for 1.0; it can be swapped in a later minor release
 - [x] MIT license file matches `package.json`
 - [x] Build without rimraf, ESLint/Jest configs fixed, husky 9, coverage off by default
 - [x] CI on Node 20 and 22 (typecheck, lint, test, build) and a tag-based publish workflow
@@ -1461,7 +1461,7 @@ for 2.0. These lists track what has landed and what still blocks 1.0.0.
 
 - [ ] Pages for configuration, scheduler, testing, dependency injection, responses, deployment and security hardening
 - [ ] API reference and FAQ
-- [ ] Update `docs/architecture.md` (stale file list, "acyclic" claim)
+- [ ] Contributor guide: project structure, and the exports that CLI-generated code relies on
 - [ ] Changelog and a versioning policy across core, CLI and docs
 
 ---
