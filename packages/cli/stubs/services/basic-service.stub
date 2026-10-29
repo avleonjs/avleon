@@ -1,0 +1,8 @@
+import { AppService } from '@avleon/core';
+
+@AppService
+export class {Service}Service {
+  sayHello() {
+    return 'Hello World!';
+  }
+}

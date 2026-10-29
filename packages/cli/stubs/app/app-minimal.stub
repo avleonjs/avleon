@@ -1,0 +1,7 @@
+import { Avleon } from '@avleon/core';
+
+const app = Avleon.createApplication();
+
+app.mapGet('/', () => 'Hello World!');
+
+export default app;

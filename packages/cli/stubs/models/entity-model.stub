@@ -1,0 +1,18 @@
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+
+@Entity({ name: '{model}' })
+export class {Model} {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  // your fields
+
+  // @Column()
+  // name: string;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+}
