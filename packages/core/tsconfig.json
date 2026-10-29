@@ -1,0 +1,38 @@
+{
+  "compilerOptions": {
+    // Environment
+    "target": "ES2022",
+    "module": "commonjs",
+    "declaration": true,
+    "sourceMap": true,
+    "outDir": "./dist",
+
+    // Decorators (typeorm, typedi, class-validator)
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+
+    // Interop
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+
+    // Type checking
+    "strict": true,
+    "strictPropertyInitialization": false,
+    "skipLibCheck": true,
+
+    // Node 20 built-ins. Jest types live in tsconfig.test.json only.
+    "types": ["node", "jest"],
+    "paths": {
+      "knex": ["./node_modules/knex/types/index.d.ts"]
+    }
+  },
+  "include": ["src/**/*"],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "**/*.test.ts",
+    "**/*.spec.ts",
+    "src/**/mock-db.ts"
+  ]
+}
