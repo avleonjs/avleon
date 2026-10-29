@@ -1,0 +1,18 @@
+{
+  "name": "avleon-monorepo",
+  "private": true,
+  "description": "Source for @avleon/core, @avleon/cli and the Avleon docs site",
+  "scripts": {
+    "setup": "npm ci --prefix packages/core && npm ci --prefix packages/cli && npm ci --prefix docs",
+    "build": "npm run build --prefix packages/core && npm run build --prefix packages/cli",
+    "typecheck": "npm run typecheck --prefix packages/core && npm run typecheck --prefix packages/cli",
+    "test": "npm test --prefix packages/core && npm test --prefix packages/cli",
+    "lint": "npm run lint --prefix packages/core",
+    "docs:dev": "npm run dev --prefix docs",
+    "docs:build": "npm run build --prefix docs",
+    "mirror": "bash scripts/mirror.sh"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
