@@ -1,4 +1,5 @@
 import "reflect-metadata";
+import { describe, expect, it } from "vitest";
 import { ApiController, Get } from "../src/common/decorators";
 import container, { getRegisteredControllers } from "../src/common/container";
 import Container, { Inject } from "typedi";

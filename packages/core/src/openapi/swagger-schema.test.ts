@@ -1,4 +1,5 @@
 import "reflect-metadata";
+import { beforeEach, describe, expect, it, vi, type Mock } from "vitest";
 import { generateClassSchema } from "./swagger-schema";
 import { registerSchemaProperty } from "./schema-properties";
 
@@ -12,9 +13,9 @@ let currentValidationMetadatas: Array<{
   constraints: any[];
 }> = [];
 
-jest.mock("class-validator", () => ({
-  getMetadataStorage: jest.fn(() => ({
-    getTargetValidationMetadatas: jest.fn(() => currentValidationMetadatas),
+vi.mock("class-validator", () => ({
+  getMetadataStorage: vi.fn(() => ({
+    getTargetValidationMetadatas: vi.fn(() => currentValidationMetadatas),
   })),
 }));
 

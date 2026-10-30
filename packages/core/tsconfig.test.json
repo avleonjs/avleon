@@ -1,8 +1,8 @@
-// Used by ts-jest and for type-checking tests. Adds jest types and test files.
+// Used for type-checking tests. Adds the test files.
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "types": ["node", "jest"],
+    "types": ["node"],
     "noEmit": true
   },
   "include": ["src/**/*", "tests/**/*"],

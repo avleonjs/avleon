@@ -3,7 +3,7 @@ import path from "path";
 
 /**
  * The package root (the directory holding `stubs/` and `package.json`). Source
- * files run from `src/**` under ts-jest and from `dist/**` once built, so walk
+ * files run from `src/**` under Vitest and from `dist/**` once built, so walk
  * up from this file instead of assuming a fixed depth.
  */
 export const packageRoot: string = (() => {

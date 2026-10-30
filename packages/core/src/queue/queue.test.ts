@@ -1,4 +1,5 @@
 import "reflect-metadata";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // bullmq is an optional peer dependency, loaded lazily through
 // loadPackageFromClient. Stub that loader so these tests exercise Avleon's
@@ -64,11 +65,12 @@ class FakeWorker {
   }
 }
 
-jest.mock("../common/utils/common-utils", () => {
-  const actual = jest.requireActual("../common/utils/common-utils");
+vi.mock("../common/utils/common-utils", async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import("../common/utils/common-utils")>();
   return {
     ...actual,
-    loadPackageFromClient: jest.fn((name: string) => {
+    loadPackageFromClient: vi.fn((name: string) => {
       if (name === "bullmq") return { Queue: FakeQueue, Worker: FakeWorker };
       return actual.loadPackageFromClient(name);
     }),
@@ -166,7 +168,9 @@ describe("AvleonQueue", () => {
       const q = new NamedQueue("emails").startWorker();
       const worker = workerInstances[0];
 
-      await expect(worker.processor({ name: "welcome", data: {} })).resolves.toBe("welcomed");
+      await expect(
+        worker.processor({ name: "welcome", data: {} }),
+      ).resolves.toBe("welcomed");
       await worker.processor({ name: "reminder", data: {} });
 
       expect(seen).toEqual(["welcome", "reminder"]);
@@ -312,7 +316,9 @@ describe("AvleonQueue", () => {
 
     it("refuses event listeners before the worker starts", () => {
       const q = new PlainQueue("emails");
-      expect(() => q.on("completed", () => {})).toThrow(/before the worker has started/);
+      expect(() => q.on("completed", () => {})).toThrow(
+        /before the worker has started/,
+      );
     });
 
     it("registers listeners once started", () => {
@@ -361,7 +367,7 @@ describe("AvleonQueue", () => {
     });
 
     it("uses the decorator's handler when the class defines none", async () => {
-      const handler = jest.fn().mockResolvedValue("from-config");
+      const handler = vi.fn().mockResolvedValue("from-config");
 
       @Queue({ name: "cfg", handler })
       class ConfigQueue extends AvleonQueue<any> {}
