@@ -46,7 +46,7 @@ declare module '@avleon/core' {
   "name": "@acme/db",
   "main": "dist/index.js",
   "avleon": { "plugin": "./dist/plugin.js" },
-  "peerDependencies": { "@avleon/core": "^0.3.0" }
+  "peerDependencies": { "@avleon/core": "^0.4.0" }
 }
 ```
 

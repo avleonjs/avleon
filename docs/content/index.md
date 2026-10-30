@@ -13,11 +13,11 @@ hero:
       text: Get Started
       link: /getting-started/introduction
     - theme: alt
-      text: Upgrading to 0.3
-      link: /getting-started/upgrading
+      text: Upgrading to 0.4
+      link: /getting-started/upgrading-0.4
     - theme: alt
       text: GitHub
-      link: https://github.com/avleonjs/avleon-core
+      link: https://github.com/avleonjs/avleon
 
 features:
   - title: Decorator-based routing
