@@ -13,7 +13,8 @@ import {
   transformAndValidate,
   formatValidationMessage,
 } from "../common/helpers";
-import Container, {
+import { Container } from "../di";
+import {
   CONTROLLER_META_KEY,
   ROUTE_META_KEY,
   PARAM_META_KEY,

@@ -5,7 +5,7 @@
  * @url https://github.com/xtareq
  */
 
-import Container from "typedi";
+import { Container } from "../di";
 import {
   CRON_META_KEY,
   INTERVAL_META_KEY,
@@ -88,7 +88,7 @@ export class AvleonScheduler {
         continue;
       }
 
-      // Resolve through typedi so constructor injection works
+      // Resolve through the container so constructor injection works
       const instance = Container.get(cls) as any;
 
       this._registerCronJobs(cls, instance);

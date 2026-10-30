@@ -1,19 +1,21 @@
 import { Environment } from "./environment-variables";
 import { Constructor, inject } from "../common/helpers";
-import Container, { Constructable } from "typedi";
-
-
+import { Container, Injectable } from "../di";
 // The abstract base
 export abstract class AvleonConfig<T = any> {
   abstract config(env: Environment): T;
 }
 
 // Constructor type that TypeScript recognizes for subclasses
-export type AvleonConfigClass<T = any> = Function & { prototype: AvleonConfig<T> };
+export type AvleonConfigClass<T = any> = Function & {
+  prototype: AvleonConfig<T>;
+};
 
 // Decorator — registers in DI
-export function AppConfig<T extends AvleonConfig>(target: Constructor<T>): Constructor<T> {
-  Container.set({ id: target, type: target });
+export function AppConfig<T extends AvleonConfig>(
+  target: Constructor<T>,
+): Constructor<T> {
+  Injectable()(target);
   return target;
 }
 export function GetConfig<T extends AvleonConfig<R>, R>(

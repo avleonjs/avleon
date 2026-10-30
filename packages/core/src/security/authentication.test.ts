@@ -1,6 +1,6 @@
 import "reflect-metadata";
 import { afterEach, describe, expect, it, test } from "vitest";
-import Container, { Service } from "typedi";
+import { Container, Injectable } from "../di";
 import { AvleonApplication } from "../core/application";
 import { AvleonTest } from "../core/testing";
 import { ApiController } from "../http/controller";
@@ -11,7 +11,7 @@ import { IRequest } from "../core/types";
 
 type User = { id: number; name: string };
 
-@Service()
+@Injectable()
 class HeaderAuthentication extends AvleonAuthentication<User> {
   async authenticate(request: IRequest): Promise<User | null> {
     const token = request.headers["x-token"];

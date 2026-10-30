@@ -1,7 +1,6 @@
 import { PathLike } from "node:fs";
 import type { Server } from "socket.io";
-import { Service, Token } from "typedi";
-
+import { Injectable, Token } from "../di";
 export const SocketIoServer = new Token<Server>("SocketIoServer");
 
 type FileAdapter = {
@@ -23,15 +22,15 @@ interface BrodcastAble {
   broadstTo: () => void;
 }
 
-@Service()
+@Injectable()
 export class AvleonSocketIo {
   private io?: Server;
 
-  sendToAll() { }
+  sendToAll() {}
 
-  sendOnly() { }
+  sendOnly() {}
 
-  sendRoom() { }
+  sendRoom() {}
 
-  receive(channel: string) { }
+  receive(channel: string) {}
 }

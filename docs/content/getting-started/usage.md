@@ -122,6 +122,37 @@ async function serve() {
 serve();
 ```
 
+## Lifecycle hooks
+
+Register work to run at each stage of the app's life. Call these before
+`run()`; each returns the app, so they chain:
+
+```ts
+app
+  .onInit(async () => {
+    // After the database connects, before routes are mapped and the server
+    // listens. A thrown error aborts startup.
+    await cache.warmUp();
+  })
+  .onReady(() => {
+    // The server is listening.
+    console.log('ready');
+  })
+  .onClose(async () => {
+    // On shutdown, after the server stops accepting requests.
+    await metrics.flush();
+  });
+```
+
+Hooks of the same kind run in the order you register them, except `onClose`
+hooks, which run in reverse so that things set up last are torn down first. A
+failing `onClose` hook is logged and the others still run.
+
+`await app.close()` shuts the app down yourself, for example at the end of a
+test. It stops the HTTP server (waiting for in-flight requests), the
+scheduler and queue workers, then runs the `onClose` hooks. Calling it twice
+is safe.
+
 ## Development and production
 
 `app.isDevelopment()` is true only when `NODE_ENV=development`. An unset
@@ -129,8 +160,8 @@ serve();
 and logs are written as JSON. Set `NODE_ENV=development` locally to get
 detailed errors, pretty logs and any docs you gate behind `isDevelopment()`.
 
-`run()` binds to localhost. On `SIGTERM` or `SIGINT` it stops the scheduler and
-closes registered workers before exiting.
+`run()` binds to localhost. On `SIGTERM` or `SIGINT` it calls `app.close()`
+before exiting.
 
 ## Next steps
 

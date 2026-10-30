@@ -22,6 +22,7 @@ npm-debug.log*
 
 # Tooling caches
 .eslintcache
+.nx/
 .husky/_/
 
 # Editors and OS

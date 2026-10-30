@@ -62,22 +62,15 @@
     "@fastify/swagger-ui": "^6.1.2",
     "@scalar/fastify-api-reference": "^1.0.0",
     "bcryptjs": "^3.0.0",
-    "better-sqlite3": ">=12.0.0",
     "bullmq": ">=5.0.0",
     "class-transformer": ">=0.5.0",
     "class-validator": ">=0.14.0",
     "fastify-socket.io": "^4.0.0",
     "ioredis": ">=5.0.0",
     "kafkajs": ">=2.0.0",
-    "knex": ">=2.0.0",
-    "mssql": ">=11.0.0",
-    "mysql2": ">=3.0.0",
-    "pg": ">=8.0.0",
     "pino-pretty": "^13.0.0",
     "sharp": ">=0.33.0",
-    "socket.io": ">=4.0.0",
-    "sqlite3": ">=5.0.0",
-    "typeorm": ">=0.3.0"
+    "socket.io": ">=4.0.0"
   },
   "peerDependenciesMeta": {
     "@fastify/compress": {
@@ -110,9 +103,6 @@
     "bcryptjs": {
       "optional": true
     },
-    "better-sqlite3": {
-      "optional": true
-    },
     "bullmq": {
       "optional": true
     },
@@ -125,18 +115,6 @@
     "kafkajs": {
       "optional": true
     },
-    "knex": {
-      "optional": true
-    },
-    "mssql": {
-      "optional": true
-    },
-    "mysql2": {
-      "optional": true
-    },
-    "pg": {
-      "optional": true
-    },
     "pino-pretty": {
       "optional": true
     },
@@ -144,12 +122,6 @@
       "optional": true
     },
     "socket.io": {
-      "optional": true
-    },
-    "sqlite3": {
-      "optional": true
-    },
-    "typeorm": {
       "optional": true
     }
   },
@@ -170,7 +142,6 @@
     "@typescript-eslint/parser": "^8.44.0",
     "@vitest/coverage-v8": "^4.1.12",
     "bcryptjs": "^3.0.3",
-    "better-sqlite3": "^12.9.0",
     "bullmq": "^5.73.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.2",
@@ -179,16 +150,10 @@
     "fastify-socket.io": "^4.0.0",
     "ioredis": "^5.10.1",
     "kafkajs": "^2.2.4",
-    "knex": "^3.1.0",
-    "mssql": "^11.0.0",
-    "mysql2": "^3.0.0",
-    "pg": "^8.0.0",
     "pino-pretty": "^13.1.3",
     "prettier": "^3.6.2",
     "sharp": "^0.35.5",
     "socket.io": "^4.8.3",
-    "sqlite3": "^6.0.1",
-    "typeorm": "^0.3.28",
     "typescript": "^5.7.2",
     "unplugin-swc": "^2.0.0",
     "vitest": "^4.1.12"

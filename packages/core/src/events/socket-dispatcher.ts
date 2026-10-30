@@ -1,10 +1,10 @@
-import { Service, Container } from "typedi";
+import { Container, Injectable } from "../di";
 import type { Socket, ServerOptions, Server } from "socket.io";
 import { SocketIoServer } from "../realtime/websocket";
 import { AsyncLocalStorage } from "node:async_hooks";
 import { sleep } from "../common/helpers";
 
-@Service()
+@Injectable()
 export class SocketContextService {
   private readonly storage = new AsyncLocalStorage<{ socket: Socket }>();
 
@@ -25,11 +25,9 @@ export type DispatchOptions = {
   retryDelay?: number;
 };
 
-
-
-@Service()
+@Injectable()
 export class SocketEventDispatcher {
-  constructor(private readonly _context: SocketContextService) { }
+  constructor(private readonly _context: SocketContextService) {}
 
   async dispatch<T = any>(
     event: string,
@@ -81,9 +79,6 @@ export class SocketEventDispatcher {
   }
 }
 
-
-
-
 export function DispatchNow(
   event: string,
   options?: Omit<DispatchOptions, "transports"> & {
@@ -107,10 +102,3 @@ export function DispatchNow(
     };
   };
 }
-
-
-
-
-
-
-

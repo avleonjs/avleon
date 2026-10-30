@@ -32,6 +32,7 @@ This monorepo holds the source for every Avleon package and the docs site, so a 
 |------------------|---------------------------------------------------------------|--------------------------------------------------------------------------------|
 | `packages/core/` | [`@avleon/core`](https://www.npmjs.com/package/@avleon/core)  | This repository (Lerna)                                                        |
 | `packages/cli/`  | [`@avleon/cli`](https://www.npmjs.com/package/@avleon/cli)    | This repository (Lerna)                                                        |
+| `packages/data/` | [`@avleon/data`](https://www.npmjs.com/package/@avleon/data)  | This repository (Lerna)                                                        |
 | `docs/`          | https://avleonjs.github.io (VitePress)                        | [avleonjs/avleonjs.github.io](https://github.com/avleonjs/avleonjs.github.io)  |
 | `resources/`     | Logos and favicons                                            | n/a                                                                            |
 | `scripts/`       | `mirror.sh`, which syncs `docs/` to its standalone repo       | n/a                                                                            |

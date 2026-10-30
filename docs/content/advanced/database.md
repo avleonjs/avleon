@@ -5,18 +5,29 @@ description: Connecting Avleon to a database with TypeORM or Knex.
 
 # Database
 
-Avleon ships with two database integrations: **TypeORM** for an entity/repository
-model, and **Knex** for a query builder. Both are optional peer dependencies —
-install the one you use, along with its driver.
+The `@avleon/data` package adds two database integrations: **TypeORM** for an
+entity/repository model, and **Knex** for a query builder. Install it with the
+library you use and its driver:
 
 ::: code-group
 ```sh [TypeORM]
-npm i typeorm pg
+npm i @avleon/data typeorm pg
 ```
 ```sh [Knex]
-npm i knex pg
+npm i @avleon/data knex pg
 ```
 :::
+
+`@avleon/data` is a [plugin](/advanced/plugins): once it is installed,
+`app.useTypeORM()` and `app.useKnex()` are available, with no import needed. Projects
+created with `avleon new` load its types through the generated
+`avleon-env.d.ts`. In other projects, add that file yourself:
+
+```ts [avleon-env.d.ts]
+/// <reference types="@avleon/data" />
+```
+
+The connection is closed when the app shuts down.
 
 ## TypeORM
 
@@ -99,7 +110,8 @@ controller. It also has a `paginate()` method, so type it as
 `PaginatedRepository`:
 
 ```ts [services/user.service.ts]
-import { AppService, InjectRepository, PaginatedRepository } from '@avleon/core';
+import { AppService } from '@avleon/core';
+import { InjectRepository, PaginatedRepository } from '@avleon/data';
 import { User } from '../models/user';
 
 @AppService
@@ -171,10 +183,10 @@ export default app;
 Extend `AvleonRepository` to keep queries in one class, with pagination and
 transactions built in. Query operators (`Like`, `ILike`, `In`, `Not`, `Between`,
 `LessThan`, `MoreThan`, `IsNull`, `Any`, `Raw`, `Equal`, `ArrayContains`) are
-exported from `@avleon/core`.
+exported from `@avleon/data`.
 
 ```ts [repositories/user.repository.ts]
-import { AvleonRepository, Repository, Like } from '@avleon/core';
+import { AvleonRepository, Repository, Like } from '@avleon/data';
 import { User } from '../models/user';
 import { AuditService } from '../services/audit.service';
 
@@ -234,7 +246,8 @@ export default app;
 Inject `KnexDB` to reach the query builder through its `client` property:
 
 ```ts [services/report.service.ts]
-import { AppService, KnexDB } from '@avleon/core';
+import { AppService } from '@avleon/core';
+import { KnexDB } from '@avleon/data';
 
 @AppService
 export class ReportService {

@@ -6,16 +6,27 @@
  */
 import { Constructor } from "../common/helpers";
 import { AvleonMiddleware } from "../http/middleware";
-import type { DataSource, DataSourceOptions } from "typeorm";
-import type { Knex } from "knex";
-import { AvleonConfig, AvleonConfigClass } from "../config/config";
+import { AvleonConfig } from "../config/config";
 import type { AvleonAuthentication } from "../security/authentication";
 import { OpenApiUiOptions } from "../openapi/openapi";
-import { FastifyServerOptions, InjectOptions, LightMyRequestResponse } from "fastify";
+import {
+  FastifyServerOptions,
+  InjectOptions,
+  LightMyRequestResponse,
+} from "fastify";
 import type { RedisOptions } from "ioredis";
+import type { PluginOptions } from "../plugins/registry";
 
 export type CorsOptions = {
-  origin?: boolean | string | RegExp | (string | RegExp)[] | ((origin: string, cb: (err: Error | null, allow?: boolean) => void) => void);
+  origin?:
+    | boolean
+    | string
+    | RegExp
+    | (string | RegExp)[]
+    | ((
+        origin: string,
+        cb: (err: Error | null, allow?: boolean) => void,
+      ) => void);
   methods?: string | string[];
   allowedHeaders?: string | string[];
   exposedHeaders?: string | string[];
@@ -37,9 +48,8 @@ export type GlobalOptions = {
   staticFiles?: any;
 };
 
-export type AvleonApplicationOptions = {
+export type AvleonApplicationOptions = PluginOptions & {
   server?: FastifyServerOptions;
-  dataSourceOptions?: DataSourceOptions;
 };
 
 export type AutoControllerOptions = {
@@ -48,27 +58,26 @@ export type AutoControllerOptions = {
 };
 
 export type CacheOptions = {
-  provider: "memory" | "redis",
-  redisOptions?: RedisOptions
-}
+  provider: "memory" | "redis";
+  redisOptions?: RedisOptions;
+};
+
+/** A function run at a stage of the application lifecycle. */
+export type LifecycleHook = () => void | Promise<void>;
 
 export interface IAvleonApplication {
   // all use
   useCors: (options: CorsOptions) => this;
-  useCache: (options?: CacheOptions)=>this;
-  /**
-   * @deprecated Use {@link useTypeORM} instead. Will be removed in the next stable version.
-   */
-  useDatasource: (dataSource: DataSource) => this;
-  /** Initialize TypeORM from a DataSource config object or an `@AppConfig` class. */
-  useTypeORM: (options: DataSourceOptions | AvleonConfigClass<DataSourceOptions>) => Promise<this>;
-  /** Initialize Knex from a config object or an `@AppConfig` class. */
-  useKnex: (options: Knex.Config | AvleonConfigClass<Knex.Config>) => Promise<this>;
+  useCache: (options?: CacheOptions) => this;
   useMultipart: (options?: any) => this;
-  useOpenApi: (options?: OpenApiUiOptions | Constructor<AvleonConfig<OpenApiUiOptions>>) => this;
+  useOpenApi: (
+    options?: OpenApiUiOptions | Constructor<AvleonConfig<OpenApiUiOptions>>,
+  ) => this;
   useMiddlewares: (middlewares: Constructor<AvleonMiddleware>[]) => this;
   /** Register the global authentication handler that populates `request.user`. */
-  useAuthentication: (authentication: Constructor<AvleonAuthentication>) => this;
+  useAuthentication: (
+    authentication: Constructor<AvleonAuthentication>,
+  ) => this;
   useAuthorization: (authorization: Constructor<any>) => this;
   useSerialization: () => this;
   useControllers: (controllers: Constructor[] | AutoControllerOptions) => this;
@@ -85,11 +94,22 @@ export interface IAvleonApplication {
   mapPut: <T extends (...args: any[]) => any>(path: string, fn: T) => any;
   mapDelete: <T extends (...args: any[]) => any>(path: string, fn: T) => any;
 
+  // lifecycle
+  /** Run during `run()`, after the database connects and before the server listens. */
+  onInit: (hook: LifecycleHook) => this;
+  /** Run once the server is listening. */
+  onReady: (hook: LifecycleHook) => this;
+  /** Run on shutdown (`close()`, SIGTERM or SIGINT), in reverse registration order. */
+  onClose: (hook: LifecycleHook) => this;
+  /** Stop the server, scheduled tasks and workers, then run the `onClose` hooks. */
+  close: () => Promise<void>;
+
   // run
   run: (port?: number, fn?: CallableFunction) => Promise<void>;
 }
 
-export type TestResponse = LightMyRequestResponse | Promise<LightMyRequestResponse>;
+export type TestResponse =
+  LightMyRequestResponse | Promise<LightMyRequestResponse>;
 
 export interface TestApplication {
   get: (url: string, options?: InjectOptions) => TestResponse;
@@ -103,5 +123,4 @@ export interface TestApplication {
 
 export type TestAppOptions = {
   controllers: Constructor[] | unknown[];
-  dataSource?: DataSourceOptions;
 };

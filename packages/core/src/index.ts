@@ -19,10 +19,8 @@ export * from "./http";
 // ─── OpenAPI ─────────────────────────────────────────────────────────────────
 export * from "./openapi";
 
-// ─── Data ────────────────────────────────────────────────────────────────────
-export * from "./data";
-// Explicit so it wins over the legacy helper of the same name in common/container.
-export { registerDataSource } from "./data";
+// ─── Collections and pagination ──────────────────────────────────────────────
+export * from "./collection";
 
 // ─── Config ──────────────────────────────────────────────────────────────────
 export * from "./config";
@@ -62,4 +60,14 @@ export const OpenApiOk = (args1: any) => {
 export const OpenApiResponse = sw.OpenApiResponse;
 export const OpenApiProperty = sw.OpenApiProperty;
 
-export { default as AvleonContainer } from "./common/container";
+// ─── Plugins ──────────────────────────────────────────────────────────────────
+export * from "./plugins";
+
+// ─── Dependency injection ────────────────────────────────────────────────────
+export {
+  Container as AvleonContainer,
+  Token,
+  Injectable,
+  createInjectDecorator,
+} from "./di";
+export type { ContainerApi, Constructable, ServiceIdentifier } from "./di";

@@ -4,10 +4,7 @@
  * @email xtrinsic96@gmail.com
  * @url https://github.com/xtareq
  */
-import Container from "typedi";
-import type { EntityTarget, ObjectLiteral, Repository } from "typeorm";
 import { NotFoundException } from "../common/exceptions";
-import { getDataSource } from "./datasource";
 import {
   PageRequest,
   Paginated,
@@ -27,9 +24,7 @@ type WhereCondition<T> = {
 };
 
 type LogicalOperators<T> =
-  | { $and: Where<T>[] }
-  | { $or: Where<T>[] }
-  | { $not: Where<T> };
+  { $and: Where<T>[] } | { $or: Where<T>[] } | { $not: Where<T> };
 
 type Where<T> = WhereCondition<T> | LogicalOperators<T>;
 
@@ -39,23 +34,6 @@ export interface IFindOneOptions<T = any> {
 
 /** @deprecated Use {@link Paginated}. Kept as an alias of the unified shape. */
 export type PaginationResult<T> = Paginated<T>;
-
-/** A TypeORM repository extended with the unified `paginate`. */
-export type PaginatedRepository<T extends ObjectLiteral> = Repository<T> & {
-  paginate(options?: PageRequest): Promise<Paginated<T>>;
-};
-
-async function paginateRepository<T extends ObjectLiteral>(
-  repo: Repository<T>,
-  options?: PageRequest,
-): Promise<Paginated<T>> {
-  const { page, perPage, offset } = normalizePageRequest(options);
-  const [data, total] = await repo.findAndCount({
-    skip: offset,
-    take: perPage,
-  });
-  return paginated(data, total, page, perPage);
-}
 
 export interface IList<T> {
   /** All items, or those matching `predicate`. */
@@ -368,46 +346,4 @@ export class Collection<T> {
   static from<T>(items: T[]): Collection<T> {
     return BasicCollectionImpl.from(items);
   }
-
-  /**
-   * The TypeORM repository for `entity`, from the registered DataSource, with
-   * the unified `paginate({ page, perPage })` added.
-   */
-  static fromRepository<T extends ObjectLiteral>(
-    entity: EntityTarget<T>,
-  ): PaginatedRepository<T> {
-    return createPaginatedRepository(entity);
-  }
-}
-
-function createPaginatedRepository<T extends ObjectLiteral>(
-  entity: EntityTarget<T>,
-  dataSource = getDataSource(),
-): PaginatedRepository<T> {
-  return dataSource.getRepository<T>(entity).extend({
-    paginate(this: Repository<T>, options?: PageRequest) {
-      return paginateRepository(this, options);
-    },
-  }) as PaginatedRepository<T>;
-}
-
-/**
- * Inject the TypeORM repository for `model`, extended with the unified
- * `paginate({ page, perPage })`. Requires a registered DataSource.
- */
-export function InjectRepository<T extends ObjectLiteral>(
-  model: EntityTarget<T>,
-) {
-  return function (
-    object: any,
-    propertyName: string | undefined,
-    index?: number,
-  ) {
-    Container.registerHandler({
-      object,
-      propertyName,
-      index,
-      value: () => createPaginatedRepository(model),
-    });
-  };
 }

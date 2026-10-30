@@ -2,7 +2,7 @@
 // Avleon Event System
 // ============================================================
 
-import { Container } from "typedi";
+import { Container } from "../di";
 import { SocketIoServer } from "../realtime/websocket";
 import { internalLogger } from "../observability/internal-logger";
 

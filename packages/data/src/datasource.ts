@@ -4,13 +4,12 @@
  * @email xtrinsic96@gmail.com
  * @url https://github.com/xtareq
  */
-import { Container } from "typedi";
+import { AvleonContainer as Container, loadPackageFromClient } from "@avleon/core";
 import type { DataSource } from "typeorm";
-import { loadPackageFromClient } from "../common/utils/common-utils";
 
 /**
  * String token under which the TypeORM `DataSource` is registered. Used by
- * `Collection.fromRepository` and `@InjectRepository`.
+ * `paginatedRepository` and `@InjectRepository`.
  */
 export const DATASOURCE_TOKEN = "idatasource";
 
@@ -20,7 +19,7 @@ export const DATASOURCE_TOKEN = "idatasource";
  * Sets both the `"idatasource"` string token and the `DataSource` class token
  * (the class the instance was built from, and the consumer's `typeorm`
  * `DataSource` export if that differs), so `@Repository`, `@InjectRepository`,
- * `Collection.fromRepository` and `Container.get(DataSource)` all resolve it.
+ * `paginatedRepository` and `Container.get(DataSource)` all resolve it.
  */
 export function registerDataSource(dataSource: DataSource): DataSource {
   if (!dataSource) {

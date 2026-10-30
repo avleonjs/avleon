@@ -5,7 +5,7 @@
  * @url https://github.com/xtareq
  */
 
-import { Service } from "typedi";
+import { Injectable } from "../di";
 import {
   API_CONTROLLER_METADATA_KEY,
   CONTROLLER_META_KEY,
@@ -68,17 +68,17 @@ export function createControllerDecorator(
         path = options.path || "/";
       }
       Reflect.defineMetadata(API_CONTROLLER_METADATA_KEY, true, target);
-      // Ensure Service is applied as a ClassDecorator
-      if (typeof Service === "function") {
+      // Ensure Injectable is applied as a ClassDecorator
+      if (typeof Injectable === "function") {
         registerController(target); // Add to custom registry
-        Service()(target); // Apply DI decorator
+        Injectable()(target); // Apply DI decorator
         Reflect.defineMetadata(
           CONTROLLER_META_KEY,
           { type, path, options },
           target,
         );
       } else {
-        throw new Error("Service decorator is not a function");
+        throw new Error("Injectable decorator is not a function");
       }
     };
   };
@@ -112,17 +112,17 @@ export function ApiController(
 ): any {
   if (typeof pathOrOptions == "function") {
     Reflect.defineMetadata(API_CONTROLLER_METADATA_KEY, true, pathOrOptions);
-    // Ensure Service is applied as a ClassDecorator
-    if (typeof Service === "function") {
+    // Ensure Injectable is applied as a ClassDecorator
+    if (typeof Injectable === "function") {
       registerController(pathOrOptions); // Add to custom registry
-      Service()(pathOrOptions); // Apply DI decorator
+      Injectable()(pathOrOptions); // Apply DI decorator
       Reflect.defineMetadata(
         CONTROLLER_META_KEY,
         { type: "api", path: "/", options: {} },
         pathOrOptions,
       );
     } else {
-      throw new Error("Service decorator is not a function");
+      throw new Error("Injectable decorator is not a function");
     }
   } else {
     if (mayBeOptions) {
