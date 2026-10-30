@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import Container from "typedi";
+import { Container } from "../di";
 import { BasicCollection, Collection } from "./collection";
 
 type Todo = {

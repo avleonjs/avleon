@@ -1,4 +1,4 @@
-import { Container, Service } from "typedi";
+import { Container, Injectable } from "../di";
 import type { Socket, Server } from "socket.io";
 import { SocketContextService } from "./socket-dispatcher";
 import { SocketIoServer } from "../realtime/websocket";
@@ -45,9 +45,9 @@ export function Subscribe(event: string): MethodDecorator {
   };
 }
 
-@Service()
+@Injectable()
 export class EventSubscriberRegistry {
-  constructor(private readonly socketContext: SocketContextService) { }
+  constructor(private readonly socketContext: SocketContextService) {}
 
   register(socket: Socket) {
     const subscriberClasses = getSocketSubscribers();

@@ -17,18 +17,16 @@ import type {
   RemoveOptions,
   EntityMetadata,
 } from "typeorm";
-import { Service } from "typedi";
 import {
-  Constructor,
+  Injectable,
   loadPackageFromClient,
-} from "../common/utils/common-utils";
-import { getDataSource } from "./datasource";
-import {
-  PageRequest,
-  Paginated,
   normalizePageRequest,
   paginated,
-} from "./pagination";
+  type Constructor,
+  type PageRequest,
+  type Paginated,
+} from "@avleon/core";
+import { getDataSource } from "./datasource";
 
 // ─── Query operators ─────────────────────────────────────────────────────────
 //
@@ -475,7 +473,7 @@ export function Repository<TEntity extends ObjectLiteral>(
       configurable: true,
       writable: true,
     });
-    Service()(Base);
+    Injectable()(Base);
     return Base;
   };
 }

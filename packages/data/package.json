@@ -1,0 +1,100 @@
+{
+  "name": "@avleon/data",
+  "version": "0.3.0",
+  "description": "TypeORM and Knex integration for Avleon",
+  "author": "Tareq Hossain",
+  "license": "MIT",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./plugin": {
+      "types": "./dist/plugin.d.ts",
+      "require": "./dist/plugin.js",
+      "default": "./dist/plugin.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "avleon": {
+    "plugin": "./dist/plugin.js"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "avleon",
+    "typeorm",
+    "knex",
+    "database",
+    "typescript"
+  ],
+  "scripts": {
+    "build": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\" && tsc -p tsconfig.json",
+    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.test.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "prepublishOnly": "npm run build"
+  },
+  "peerDependencies": {
+    "@avleon/core": "^0.3.0",
+    "better-sqlite3": ">=12.0.0",
+    "knex": ">=2.0.0",
+    "mssql": ">=11.0.0",
+    "mysql2": ">=3.0.0",
+    "pg": ">=8.0.0",
+    "sqlite3": ">=5.0.0",
+    "typeorm": ">=0.3.0"
+  },
+  "peerDependenciesMeta": {
+    "better-sqlite3": {
+      "optional": true
+    },
+    "knex": {
+      "optional": true
+    },
+    "mssql": {
+      "optional": true
+    },
+    "mysql2": {
+      "optional": true
+    },
+    "pg": {
+      "optional": true
+    },
+    "sqlite3": {
+      "optional": true
+    },
+    "typeorm": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@avleon/core": "^0.3.0",
+    "@swc/core": "^1.16.20",
+    "@types/node": "^20.19.17",
+    "better-sqlite3": "^12.9.0",
+    "knex": "^3.1.0",
+    "reflect-metadata": "^0.2.2",
+    "typeorm": "^0.3.28",
+    "typescript": "^5.7.2",
+    "unplugin-swc": "^2.0.0",
+    "vitest": "^4.1.12"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/avleonjs/avleon.git",
+    "directory": "packages/data"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

@@ -223,7 +223,8 @@ export class UsersController {
 ```
 
 ```ts [services/user.service.ts]
-import { AppService, InjectRepository, PaginatedRepository } from '@avleon/core';
+import { AppService } from '@avleon/core';
+import { InjectRepository, PaginatedRepository } from '@avleon/data';
 import { User } from '../models/user';
 
 @AppService

@@ -10,7 +10,7 @@ import type {
   WorkerOptions,
   ConnectionOptions,
 } from "bullmq";
-import Container, { Service } from "typedi";
+import { Container, Injectable } from "../di";
 import { loadPackageFromClient } from "../common/utils/common-utils";
 import { internalLogger } from "../observability/internal-logger";
 import { MemoryWorker, QueueDriver, resolveQueueDriver } from "./memory-driver";
@@ -199,7 +199,7 @@ export function AvleonWorker(config: WorkerConfig): ClassDecorator {
       configurable: true,
     });
 
-    Service()(target);
+    Injectable()(target);
     workerRegistry.add(target);
 
     return target;

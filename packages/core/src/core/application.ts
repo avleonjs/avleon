@@ -8,13 +8,14 @@ import Fastify, { FastifyInstance, HTTPMethods } from "fastify";
 import path from "path";
 import fs from "fs";
 import { AvleonRouter } from "./router";
-import Container, { Constructable } from "typedi";
+import { Container } from "../di";
 import {
   IAvleonApplication,
   AvleonApplicationOptions,
   CorsOptions,
   GlobalOptions,
   CacheOptions,
+  LifecycleHook,
 } from "./interfaces";
 import { BaseHttpException } from "../common/exceptions";
 import { SystemUseError } from "../common/exceptions/system-exception";
@@ -28,31 +29,13 @@ import { AutoControllerOptions, IResponse, TestApplication } from "./types";
 
 import type { RedisOptions } from "ioredis";
 import { CacheManager } from "../observability/cache";
-import type { DataSource, DataSourceOptions } from "typeorm";
-import { AvleonConfig, AvleonConfigClass } from "../config/config";
-import { Environment } from "../config/environment-variables";
-import type { Knex } from "knex";
-import { AVLEON_KNEX_DB } from "../data/knex-provider";
+import { AvleonConfig } from "../config/config";
 import { AvleonAuthentication } from "../security/authentication";
-type DataSourceInput =
-  | Constructor<AvleonConfig<DataSourceOptions>>
-  | AvleonConfig<DataSourceOptions>
-  | DataSourceOptions;
+import { registerPlugins } from "../plugins/registry";
+import { internalLogger } from "../observability/internal-logger";
 // ---------------------------------------------------------------------------
 // Lazy loaders for optional peer dependencies
 // ---------------------------------------------------------------------------
-
-function requireTypeorm() {
-  try {
-    return require("typeorm");
-  } catch {
-    throw new Error(
-      "[Avleon] typeorm is not installed.\n" +
-        "Run: npm install typeorm\n" +
-        "Then install a driver: npm install pg  (or mysql2, sqlite3, etc.)",
-    );
-  }
-}
 
 function requireSocketIo() {
   try {
@@ -61,18 +44,6 @@ function requireSocketIo() {
     throw new Error(
       "[Avleon] fastify-socket.io is not installed.\n" +
         "Run: npm install fastify-socket.io socket.io",
-    );
-  }
-}
-
-function requireKnex() {
-  try {
-    return require("knex");
-  } catch {
-    throw new Error(
-      "[Avleon] knex is not installed.\n" +
-        "Run: npm install knex\n" +
-        "Then install a driver: npm install pg  (or mysql2, sqlite3, etc.)",
     );
   }
 }
@@ -144,21 +115,6 @@ function requireStatic() {
 }
 
 // ---------------------------------------------------------------------------
-// Knex integration types
-// ---------------------------------------------------------------------------
-
-/** Lifecycle hooks passed to useKnex. */
-export interface KnexHooks {
-  /** Called once after the knex instance is created and ready. */
-  onInit?: (db: any) => void | Promise<void>;
-  /** Called when knex encounters a connection error. */
-  onError?: (err: Error) => void;
-}
-
-/** A sync or async factory that returns KnexHooks. */
-export type KnexHooksFactory = () => KnexHooks | Promise<KnexHooks>;
-
-// ---------------------------------------------------------------------------
 // Application
 // ---------------------------------------------------------------------------
 
@@ -169,20 +125,25 @@ export class AvleonApplication implements IAvleonApplication {
   private alreadyRun = false;
   private hasSwagger = false;
   private globalSwaggerOptions: OpenApiUiOptions | undefined;
-  private dataSourceOptions: any | null = null; // ✅ no longer typed as DataSourceOptions
-  private dataSource: any | null = null; // ✅ no longer typed as DataSource
   private isMapFeatures = false;
   private registerControllerAuto = false;
   private registerControllerPath = "src/controllers";
   private controllers: any[] = [];
   private _hasWebsocket = false;
   private io: any;
-  private _knexHooksFactory: KnexHooksFactory | null = null;
   private scheduler: AvleonScheduler = new AvleonScheduler();
   private schedulerTasks: any[] = [];
   private registerSchedulerAuto = false;
   private registerSchedulerPath = "src/tasks";
   private _workers: any[] = [];
+  private lifecycleHooks: Record<"init" | "ready" | "close", LifecycleHook[]> =
+    {
+      init: [],
+      ready: [],
+      close: [],
+    };
+  private closing: Promise<void> | null = null;
+  private pluginNames: string[] = [];
 
   private constructor(options?: AvleonApplicationOptions) {
     this.app = Fastify({
@@ -196,15 +157,18 @@ export class AvleonApplication implements IAvleonApplication {
     }) as FastifyInstance;
     this.router = new AvleonRouter(this.app);
 
-    // ✅ Only load typeorm if dataSourceOptions provided
-    if (options?.dataSourceOptions) {
-      this.dataSourceOptions = options.dataSourceOptions;
-      if (this.dataSourceOptions) {
-        const { DataSource } = requireTypeorm();
-        this.dataSource = new DataSource(this.dataSourceOptions);
-        Container.set(DataSource, this.dataSource);
-      }
+    this.pluginNames = registerPlugins(this, options);
+    if (this.pluginNames.length) {
+      internalLogger("plugins").info(
+        { plugins: this.pluginNames },
+        "Plugins registered",
+      );
     }
+  }
+
+  /** Names of the registered plugins, in registration order. */
+  getPlugins(): readonly string[] {
+    return this.pluginNames;
   }
 
   public static getApp(options?: AvleonApplicationOptions) {
@@ -233,104 +197,6 @@ export class AvleonApplication implements IAvleonApplication {
       Container.set(CacheManager, new CacheManager());
     }
     return this;
-  }
-
-  /**
-   * @deprecated will be removed in next stable version
-   * @param dataSource
-   * @see useTypeorm
-   */
-  useDatasource(dataSource: any) {
-    // ✅ lazy — only resolve DataSource token when actually used
-    const { DataSource } = requireTypeorm();
-    this.dataSource = dataSource;
-    Container.set(DataSource, this.dataSource);
-    return this;
-  }
-
-  private isConfigClass<T>(
-    options: AvleonConfigClass<T> | any,
-  ): options is AvleonConfigClass<T> {
-    return (
-      typeof options === "function" && options.prototype instanceof AvleonConfig
-    );
-  }
-
-  // Overloads
-  useKnex(options: Knex.Config): Promise<this>;
-  useKnex(options: AvleonConfigClass<Knex.Config>): Promise<this>;
-  useKnex(options: Knex.Config | AvleonConfigClass<Knex.Config>): Promise<this>;
-  async useKnex(
-    options: Knex.Config | AvleonConfigClass<Knex.Config>,
-  ): Promise<this> {
-    const k = loadPackageFromClient<typeof import("knex")>("knex");
-    let knexOptions: Knex.Config;
-
-    if (
-      options instanceof Function &&
-      options.prototype instanceof AvleonConfig
-    ) {
-      // It's a config class — resolve from DI and call .config()
-      const instance = Container.get<AvleonConfig<Knex.Config>>(options as any);
-      const env = Container.get(Environment);
-      knexOptions = instance.config(env);
-    } else {
-      knexOptions = options as Knex.Config;
-    }
-
-    if (knexOptions?.client) {
-      loadPackageFromClient(knexOptions.client as string);
-    }
-
-    const dataSource = k(knexOptions);
-    Container.set(AVLEON_KNEX_DB, dataSource);
-    await this._initKnex(dataSource);
-    return this;
-  }
-
-  private async _initKnex(knex: Knex) {
-    await knex.raw("SELECT 1");
-  }
-
-  useTypeORM(dbOptions: DataSourceOptions): Promise<this>;
-  useTypeORM(dbOptions: AvleonConfigClass<any>): Promise<this>;
-  useTypeORM(
-    dbOptions: DataSourceOptions | AvleonConfigClass<DataSourceOptions>,
-  ): Promise<this>;
-  async useTypeORM(
-    dbOptions: DataSourceOptions | AvleonConfigClass<DataSourceOptions>,
-  ): Promise<this> {
-    const t = loadPackageFromClient<typeof import("typeorm")>("typeorm");
-    let options: DataSourceOptions;
-
-    if (
-      dbOptions instanceof Function &&
-      dbOptions.prototype instanceof AvleonConfig
-    ) {
-      const instance =
-        Container.get<AvleonConfig<DataSourceOptions>>(dbOptions);
-      const env = Container.get(Environment);
-      options = instance.config(env);
-    } else {
-      options = dbOptions as DataSourceOptions;
-    }
-
-    const dataSource = new t.DataSource(options);
-    Container.set(t.DataSource, dataSource);
-    await this._initTypeorm(dataSource);
-    return this;
-  }
-
-  private async _initTypeorm(dataSource: DataSource) {
-    try {
-      await dataSource.initialize();
-      this.dataSource = dataSource;
-      console.log("✅ Database connected");
-      return dataSource;
-    } catch (error) {
-      console.error("❌ Database connection failed:", error);
-      throw error;
-    }
   }
 
   useMultipart(options?: any) {
@@ -673,12 +539,6 @@ export class AvleonApplication implements IAvleonApplication {
     }
   }
 
-  private async initializeDatabase() {
-    if (this.dataSourceOptions && this.dataSource) {
-      await this.dataSource.initialize();
-    }
-  }
-
   private handleSocket(socket: any) {
     // ✅ lazy — only resolve socket services when socket actually connects
     try {
@@ -717,27 +577,71 @@ export class AvleonApplication implements IAvleonApplication {
     return this.router.mapDelete(path, fn);
   }
 
-  // ── Run ──────────────────────────────────────────────────────────────────
+  // ── Lifecycle ────────────────────────────────────────────────────────────
 
-  private async _initKnexHooks(): Promise<void> {
-    if (!this._knexHooksFactory) return;
-    try {
-      const { DB } = require("../data/knex-provider");
-      const db = Container.get(DB) as any;
-      const hooks = await this._knexHooksFactory();
-      if (hooks.onInit) {
-        await hooks.onInit(db.instance ?? db);
+  /**
+   * Run `hook` during `run()`, after the database connects and before routes
+   * are mapped and the server listens. A rejected hook aborts startup.
+   */
+  onInit(hook: LifecycleHook) {
+    this.assertNotStarted("onInit");
+    this.lifecycleHooks.init.push(hook);
+    return this;
+  }
+
+  /** Run `hook` once the server is listening. */
+  onReady(hook: LifecycleHook) {
+    this.assertNotStarted("onReady");
+    this.lifecycleHooks.ready.push(hook);
+    return this;
+  }
+
+  /**
+   * Run `hook` when the app shuts down: on `close()`, SIGTERM or SIGINT.
+   * Close hooks run in reverse registration order, after the server has
+   * stopped accepting requests. A failing hook is logged and the rest still run.
+   */
+  onClose(hook: LifecycleHook) {
+    this.lifecycleHooks.close.push(hook);
+    return this;
+  }
+
+  /**
+   * Shut the app down: stop the HTTP server (waiting for in-flight requests),
+   * stop scheduled tasks and queue workers, then run the `onClose` hooks.
+   * Calling it again returns the same shutdown.
+   */
+  close(): Promise<void> {
+    this.closing ??= this._close();
+    return this.closing;
+  }
+
+  private async _close() {
+    await this.app.close();
+    this.scheduler.stopAll();
+    await this._closeWorkers();
+    for (const hook of [...this.lifecycleHooks.close].reverse()) {
+      try {
+        await hook();
+      } catch (err) {
+        console.error("[Avleon] onClose hook failed:", err);
       }
-      if (hooks.onError) {
-        const knexInstance = db.instance ?? db;
-        if (knexInstance && typeof knexInstance.on === "function") {
-          knexInstance.on("error", hooks.onError);
-        }
-      }
-    } catch (e: any) {
-      console.warn("[Avleon] Knex hooks error:", e?.message ?? e);
     }
   }
+
+  private assertNotStarted(method: string) {
+    if (this.alreadyRun) {
+      throw new SystemUseError(`${method}() must be called before run()`);
+    }
+  }
+
+  private async runHooks(hooks: LifecycleHook[]) {
+    for (const hook of hooks) {
+      await hook();
+    }
+  }
+
+  // ── Run ──────────────────────────────────────────────────────────────────
 
   private async _autoSchedulerTasks(): Promise<void> {
     const isTsNode =
@@ -789,8 +693,7 @@ export class AvleonApplication implements IAvleonApplication {
       await this.initSwagger(this.globalSwaggerOptions);
     }
 
-    await this.initializeDatabase();
-    await this._initKnexHooks();
+    await this.runHooks(this.lifecycleHooks.init);
 
     if (this.isMapFeatures) {
       this._mapFeatures();
@@ -903,8 +806,7 @@ export class AvleonApplication implements IAvleonApplication {
     }
 
     const gracefulStop = async () => {
-      this.scheduler.stopAll();
-      await this._closeWorkers();
+      await this.close();
       process.exit(0);
     };
     process.once("SIGTERM", gracefulStop);
@@ -912,6 +814,7 @@ export class AvleonApplication implements IAvleonApplication {
 
     await this.app.listen({ port });
     console.log(`Application running on http://127.0.0.1:${port}`);
+    await this.runHooks(this.lifecycleHooks.ready);
     if (fn) fn();
   }
 }

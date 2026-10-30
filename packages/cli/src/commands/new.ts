@@ -5,6 +5,7 @@ import { CliError } from "../errors";
 import { c, log } from "../utils/log";
 import { kebabCase, titleCase } from "../utils/names";
 import { cliVersion, coreRange, renderStub } from "../utils/stubs";
+import { ENV_TYPES_FILE, envTypesFile } from "../utils/env-types";
 
 export const PACKAGE_MANAGERS = ["npm", "yarn", "pnpm"] as const;
 export type PackageManager = (typeof PACKAGE_MANAGERS)[number];
@@ -106,6 +107,7 @@ export function packageJson(name: string, features: Feature[], minimal: boolean)
   const pick = (...names: string[]) => names.forEach((n) => (deps[n] = DEP_VERSIONS[n]));
   pick("class-transformer", "class-validator", "reflect-metadata");
   if (features.includes("cors")) pick("@fastify/cors");
+  if (usesData(features)) deps["@avleon/data"] = `^${v}`;
   if (features.includes("typeorm")) pick("typeorm", "pg");
   if (features.includes("knex")) pick("knex", "pg");
   if (features.includes("scalar")) pick("@scalar/fastify-api-reference");
@@ -142,6 +144,11 @@ export function packageJson(name: string, features: Feature[], minimal: boolean)
     devDependencies: sortKeys(devDeps),
   };
   return JSON.stringify(pkg, null, 2) + "\n";
+}
+
+/** TypeORM and Knex come from the @avleon/data plugin. */
+function usesData(features: Feature[]) {
+  return features.includes("typeorm") || features.includes("knex");
 }
 
 function sortKeys(obj: Record<string, string>) {
@@ -236,6 +243,7 @@ export async function createApplication(name: string, opts: NewOptions = {}): Pr
   add("src/serve.ts", renderStub("project/serve.stub"));
   add("package.json", packageJson(appName, features, minimal));
   add("tsconfig.json", renderStub("project/tsconfig.stub"));
+  add(ENV_TYPES_FILE, envTypesFile(usesData(features) ? ["@avleon/data"] : []));
   add("tsconfig.build.json", renderStub("project/tsconfig.build.stub"));
   add(".gitignore", renderStub("project/gitignore.stub"));
   add(".env", renderStub("project/env.stub"));

@@ -4,7 +4,7 @@
  * @email xtrinsic96@gmail.com
  * @url https://github.com/xtareq
  */
-import { Service } from "typedi";
+import { Injectable } from "../di";
 import { IRequest, IResponse } from "../core/types";
 import { HttpExceptionTypes as HttpException } from "../common/exceptions";
 import { AUTHORIZATION_META_KEY } from "../common/container";
@@ -40,7 +40,7 @@ export function CanAuthorize(target: { new (...args: any[]): AuthorizeClass }) {
       `Class "${target.name}" must implement an "authorize" method.`,
     );
   }
-  Service()(target);
+  Injectable()(target);
 }
 
 /**
@@ -100,7 +100,7 @@ export function AppMiddleware(target: Constructor<AvleonMiddleware>) {
     );
   }
 
-  Service()(target);
+  Injectable()(target);
 }
 
 /**

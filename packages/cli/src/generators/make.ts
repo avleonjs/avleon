@@ -3,7 +3,7 @@ import path from "path";
 import { CliError } from "../errors";
 import { log } from "../utils/log";
 import { resolveName, snakeCase } from "../utils/names";
-import { requireProjectRoot, writeFileSafe } from "../utils/project";
+import { installedVersion, requireProjectRoot, writeFileSafe } from "../utils/project";
 import { renderStub } from "../utils/stubs";
 
 export type MakeBaseOptions = {
@@ -100,6 +100,9 @@ function writeResourceService(
   if (asDependency) ensureDependency(serviceFile, render, "Service", projectRoot);
   else write(serviceFile, render(), force, "Service", projectRoot);
   ensureDependency(modelFile, () => renderModel(m.base, orm), "Model", projectRoot);
+  if (orm && !installedVersion("@avleon/data", projectRoot)) {
+    log.warn("The generated service uses @avleon/data. Install it: npm install @avleon/data typeorm");
+  }
 }
 
 export function makeService(name: string, opts: MakeServiceOptions = {}): string {

@@ -5,7 +5,7 @@
  * @url https://github.com/xtareq
  */
 
-import { Service } from "typedi";
+import { Injectable } from "../di";
 import {
   SCHEDULED_TASK_META_KEY,
   CRON_META_KEY,
@@ -36,7 +36,7 @@ function addJobMeta<T>(key: symbol, target: Function, meta: T): void {
  * All methods decorated with @Cron, @Interval, or @Timeout inside this class
  * will be automatically discovered and started when the application boots.
  *
- * The class is registered with typedi so constructor injection works normally.
+ * The class is registered with the container so constructor injection works normally.
  *
  * @example
  * @ScheduledTask()
@@ -51,7 +51,7 @@ export function ScheduledTask(): ClassDecorator {
   return function (target: Function) {
     Reflect.defineMetadata(SCHEDULED_TASK_META_KEY, true, target);
     registerTask(target);
-    Service()(target as any);
+    Injectable()(target as any);
   };
 }
 

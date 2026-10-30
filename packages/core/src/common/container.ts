@@ -4,8 +4,7 @@
  * @email xtrinsic96@gmail.com
  * @url https://github.com/xtareq
  */
-import { Container } from "typedi";
-
+import { Container } from "../di";
 export const ROUTE_META_KEY = Symbol("iroute:options");
 export const CONTROLLER_META_KEY = Symbol("icontroller:options");
 export const PARAM_META_KEY = Symbol("iparam:options");
@@ -42,4 +41,3 @@ export const API_CONTROLLER_METADATA_KEY = Symbol("apiController");
 export function isApiController(target: Function): boolean {
   return Reflect.getMetadata(API_CONTROLLER_METADATA_KEY, target) === true;
 }
-export default Container;

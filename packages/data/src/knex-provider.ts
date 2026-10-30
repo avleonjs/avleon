@@ -1,11 +1,13 @@
-import { Container, Service, Token } from "typedi";
-import type { Knex } from "knex";
 import {
-  PageRequest,
-  Paginated,
+  AvleonContainer as Container,
+  Injectable,
+  Token,
   normalizePageRequest,
   paginated,
-} from "./pagination";
+  type PageRequest,
+  type Paginated,
+} from "@avleon/core";
+import type { Knex } from "knex";
 
 /** DI token holding the initialized Knex instance. Set by `app.useKnex(...)`. */
 export const AVLEON_KNEX_DB = new Token<Knex>("AVLEON_KNEX_DB");
@@ -16,7 +18,7 @@ export const AVLEON_KNEX_DB = new Token<Knex>("AVLEON_KNEX_DB");
  * The connection itself is created by `app.useKnex(...)`, which registers it
  * under {@link AVLEON_KNEX_DB}. Resolving this service before that call throws.
  */
-@Service()
+@Injectable()
 export class KnexDB {
   private readonly connection: Knex;
 

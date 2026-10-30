@@ -13,7 +13,7 @@ import type {
   WorkerOptions,
   ConnectionOptions,
 } from "bullmq";
-import { Service } from "typedi";
+import { Injectable } from "../di";
 import { loadPackageFromClient } from "../common/utils/common-utils";
 import { internalLogger } from "../observability/internal-logger";
 import {
@@ -450,12 +450,12 @@ export function Queue(config: QueueConfig) {
       }
     };
 
-    // Applied as a call, not `@Service()`, so TypeScript emits no
-    // `design:paramtypes` for the wrapper; typedi then reads the decorated
+    // Applied as a call, not `@Injectable()`, so TypeScript emits no
+    // `design:paramtypes` for the wrapper; the container then reads the decorated
     // class's own parameter types through the prototype chain.
-    Service()(QueueClass);
+    Injectable()(QueueClass);
 
-    // Preserve the original class name for debugging and typedi token lookup.
+    // Preserve the original class name for debugging and container token lookup.
     Object.defineProperty(QueueClass, "name", {
       value: Base.name,
       writable: false,

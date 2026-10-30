@@ -1,0 +1,10 @@
+// Used for type-checking tests. Adds the test files.
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "rootDir": "."
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}

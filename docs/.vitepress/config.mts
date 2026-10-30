@@ -51,6 +51,7 @@ export default defineConfig({
           { text: 'File Uploads', link: '/advanced/file-uploads' },
           { text: 'Caching', link: '/advanced/caching' },
           { text: 'Logging', link: '/advanced/logging' },
+          { text: 'Plugins', link: '/advanced/plugins' },
         ],
       },
       {

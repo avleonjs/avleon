@@ -5,10 +5,8 @@ import {
   createControllerDecorator,
   ControllerOptions,
 } from "./controller";
-import { Service } from "typedi";
+import { Injectable } from "../di";
 import * as containerModule from "../common/container";
-import { Service as TypediService } from "typedi";
-
 describe("Controller Decorators", () => {
   beforeEach(() => {
     vi.clearAllMocks();
