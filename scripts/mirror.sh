@@ -4,7 +4,7 @@
 # The standalone repos keep their own CI, so releases and deploys work
 # exactly as before:
 #   packages/core -> avleonjs/avleon-core         (publishes to npm on a v* tag)
-#   packages/cli  -> avleonjs/avleon-cli          (releases on push to main)
+#   packages/cli  -> avleonjs/avleon-cli          (publishes to npm on a v* tag)
 #   docs          -> avleonjs/avleonjs.github.io  (deploys GitHub Pages on push to main)
 #
 # Usage:
