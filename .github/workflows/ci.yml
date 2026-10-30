@@ -23,12 +23,14 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: npm
 
+      # Lerna 10 needs Node 22.22+, so the checks call the workspace scripts
+      # through npm and run on every supported Node version.
       - run: npm ci
       - name: Type-check
-        run: npx tsc --noEmit
+        run: npm run typecheck --workspaces --if-present
       - name: Lint
-        run: npm run lint
+        run: npm run lint --workspaces --if-present
       - name: Test
-        run: npm test
+        run: npm test --workspaces --if-present
       - name: Build
-        run: npm run build
+        run: npm run build --workspaces --if-present

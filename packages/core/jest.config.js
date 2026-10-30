@@ -22,5 +22,13 @@ module.exports = {
         tsconfig: "tsconfig.test.json",
       },
     ],
+    // cookie@2 (used by fastify's light-my-request) ships ESM only.
+    "[\\\\/]node_modules[\\\\/]cookie[\\\\/].+\\.js$": [
+      "ts-jest",
+      {
+        tsconfig: { allowJs: true, module: "commonjs" },
+      },
+    ],
   },
+  transformIgnorePatterns: ["/node_modules/(?!cookie/)"],
 };

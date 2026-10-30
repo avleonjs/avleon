@@ -40,8 +40,7 @@
     "format": "prettier --write .",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage",
-    "prepare": "husky"
+    "test:coverage": "jest --coverage"
   },
   "dependencies": {
     "dotenv": "^17.3.1",
@@ -58,9 +57,9 @@
     "@fastify/helmet": "^13.0.0",
     "@fastify/multipart": "^9.0.0",
     "@fastify/rate-limit": "^11.0.0",
-    "@fastify/static": "^8.0.0",
+    "@fastify/static": "^10.1.2",
     "@fastify/swagger": "^9.0.0",
-    "@fastify/swagger-ui": "^5.0.0",
+    "@fastify/swagger-ui": "^6.1.2",
     "@scalar/fastify-api-reference": "^1.0.0",
     "bcryptjs": "^3.0.0",
     "better-sqlite3": ">=12.0.0",
@@ -160,9 +159,9 @@
     "@fastify/helmet": "^13.2.0",
     "@fastify/multipart": "^9.0.3",
     "@fastify/rate-limit": "^11.2.1",
-    "@fastify/static": "^8.1.1",
+    "@fastify/static": "^10.1.8",
     "@fastify/swagger": "^9.7.0",
-    "@fastify/swagger-ui": "^5.2.5",
+    "@fastify/swagger-ui": "^6.1.2",
     "@scalar/fastify-api-reference": "^1.0.0",
     "@types/jest": "^29.5.14",
     "@types/node": "^20.19.17",
@@ -177,32 +176,31 @@
     "eslint": "^9.36.0",
     "eslint-config-prettier": "^10.1.8",
     "fastify-socket.io": "^4.0.0",
-    "husky": "^9.1.7",
     "ioredis": "^5.10.1",
     "jest": "^29.7.0",
     "kafkajs": "^2.2.4",
     "knex": "^3.1.0",
-    "lint-staged": "^16.1.6",
     "mssql": "^11.0.0",
     "mysql2": "^3.0.0",
     "pg": "^8.0.0",
     "pino-pretty": "^13.1.3",
     "prettier": "^3.6.2",
-    "sharp": "^0.33.0",
+    "sharp": "^0.35.5",
     "socket.io": "^4.8.3",
-    "sqlite3": "^5.0.0",
+    "sqlite3": "^6.0.1",
     "ts-jest": "^29.4.4",
     "typeorm": "^0.3.28",
     "typescript": "^5.7.2"
   },
   "lint-staged": {
     "*.{js,mjs,ts,json,md}": "prettier --write",
-    "*.{js,mjs,ts}": "eslint --fix",
-    "*.ts": "jest --bail --findRelatedTests --passWithNoTests"
+    "*.{js,mjs,ts}": "npm exec -w @avleon/core -- eslint --fix",
+    "*.ts": "npm exec -w @avleon/core -- jest --bail --findRelatedTests --passWithNoTests"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/avleonjs/avleon-core"
+    "url": "git+https://github.com/avleonjs/avleon.git",
+    "directory": "packages/core"
   },
   "publishConfig": {
     "access": "public"

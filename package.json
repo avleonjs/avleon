@@ -2,17 +2,33 @@
   "name": "avleon-monorepo",
   "private": true,
   "description": "Source for @avleon/core, @avleon/cli and the Avleon docs site",
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
-    "setup": "npm ci --prefix packages/core && npm ci --prefix packages/cli && npm ci --prefix docs",
-    "build": "npm run build --prefix packages/core && npm run build --prefix packages/cli",
-    "typecheck": "npm run typecheck --prefix packages/core && npm run typecheck --prefix packages/cli",
-    "test": "npm test --prefix packages/core && npm test --prefix packages/cli",
-    "lint": "npm run lint --prefix packages/core",
+    "setup": "npm ci && npm ci --prefix docs",
+    "build": "lerna run build",
+    "typecheck": "lerna run typecheck",
+    "test": "lerna run test",
+    "lint": "lerna run lint",
+    "release": "lerna version",
     "docs:dev": "npm run dev --prefix docs",
     "docs:build": "npm run build --prefix docs",
-    "mirror": "bash scripts/mirror.sh"
+    "mirror": "bash scripts/mirror.sh",
+    "prepare": "husky",
+    "version": "node scripts/sync-peer-ranges.js"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lerna": "^10.1.1",
+    "lint-staged": "^16.1.6"
   },
   "engines": {
     "node": ">=20"
+  },
+  "overrides": {
+    "nx": {
+      "undici": "^7.30.1"
+    }
   }
 }
