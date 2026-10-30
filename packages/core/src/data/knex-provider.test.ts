@@ -1,4 +1,5 @@
 import "reflect-metadata";
+import { beforeEach, describe, expect, it } from "vitest";
 import { Container } from "typedi";
 import type { Knex } from "knex";
 import { KnexDB, AVLEON_KNEX_DB } from "./knex-provider";

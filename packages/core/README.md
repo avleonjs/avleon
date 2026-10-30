@@ -1440,7 +1440,7 @@ for 2.0. These lists track what has landed and what still blocks 1.0.0.
 - [ ] Finish or remove the no-ops `useHttps()`, `useSerialization()` and `mapFeatures()`, and remove deprecated `useDatasource()`
 - [ ] Remove the `AvleonSocketIo` stubs and unused adapter types
 - [ ] Remove `KnexHooks` / `KnexHooksFactory`, `DuplicateRouteException`, `mapRoute()` and `registerMiddleware()`
-- [ ] Stop exporting `mock-db` from the public index, and build without Jest types
+- [x] Stop exporting `mock-db` from the public index, and build without Jest types
 - [ ] Replace remaining `console.log` calls with the logger
 
 **Tests**

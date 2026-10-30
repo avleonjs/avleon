@@ -1,3 +1,12 @@
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+  type MockInstance,
+} from "vitest";
 import fs from "fs";
 import os from "os";
 import path from "path";
@@ -44,14 +53,14 @@ describe("FileStorage", () => {
   let root: string;
   let baseDir: string;
   let storage: FileStorage;
-  let consoleSpy: jest.SpyInstance;
+  let consoleSpy: MockInstance;
 
   beforeEach(() => {
     root = fs.mkdtempSync(path.join(os.tmpdir(), "avleon-storage-"));
     baseDir = path.join(root, "public");
     fs.mkdirSync(baseDir);
     storage = new FileStorage().configure({ baseDir });
-    consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+    consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
   });
 
   afterEach(() => {

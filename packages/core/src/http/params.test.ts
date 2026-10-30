@@ -1,4 +1,5 @@
 import "reflect-metadata";
+import { describe, expect, it, test } from "vitest";
 import { Param, Query, Body, Header, AuthUser } from "./params";
 import {
   PARAM_META_KEY,

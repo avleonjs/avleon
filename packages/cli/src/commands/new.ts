@@ -37,9 +37,10 @@ const DEP_VERSIONS: Record<string, string> = {
   "@scalar/fastify-api-reference": "^1.0.0",
   typescript: "^5.7.2",
   "@types/node": "^22.9.3",
-  jest: "^29.7.0",
-  "ts-jest": "^29.2.6",
-  "@types/jest": "^29.5.14",
+  vitest: "^4.1.12",
+  "@vitest/coverage-v8": "^4.1.12",
+  "unplugin-swc": "^2.0.0",
+  "@swc/core": "^1.16.20",
 };
 
 function isDirEmpty(dir: string) {
@@ -112,7 +113,7 @@ export function packageJson(name: string, features: Feature[], minimal: boolean)
   const devDeps: Record<string, string> = {};
   const pickDev = (...names: string[]) => names.forEach((n) => (devDeps[n] = DEP_VERSIONS[n]));
   pickDev("@types/node", "typescript");
-  if (!minimal) pickDev("@types/jest", "jest", "ts-jest");
+  if (!minimal) pickDev("@swc/core", "@vitest/coverage-v8", "unplugin-swc", "vitest");
 
   const scripts: Record<string, string> = {
     "start:dev": "avleon serve",
@@ -121,10 +122,10 @@ export function packageJson(name: string, features: Feature[], minimal: boolean)
   };
   if (!minimal) {
     Object.assign(scripts, {
-      test: "jest",
-      "test:watch": "jest --watch",
-      "test:cov": "jest --coverage",
-      "test:e2e": "jest --config ./test/e2e-spec.json",
+      test: "vitest run",
+      "test:watch": "vitest",
+      "test:cov": "vitest run --coverage",
+      "test:e2e": "vitest run --config vitest.e2e.config.mts",
     });
   }
 
@@ -140,16 +141,6 @@ export function packageJson(name: string, features: Feature[], minimal: boolean)
     dependencies: sortKeys(deps),
     devDependencies: sortKeys(devDeps),
   };
-  if (!minimal) {
-    pkg.jest = {
-      preset: "ts-jest",
-      rootDir: "src",
-      testRegex: ".*\\.spec\\.ts$",
-      collectCoverageFrom: ["**/*.(t|j)s"],
-      coverageDirectory: "../coverage",
-      testEnvironment: "node",
-    };
-  }
   return JSON.stringify(pkg, null, 2) + "\n";
 }
 
@@ -239,7 +230,8 @@ export async function createApplication(name: string, opts: NewOptions = {}): Pr
       );
     }
     add("src/app.ts", appSource(features));
-    add("test/e2e-spec.json", renderStub("project/e2e-spec.stub"));
+    add("vitest.config.mts", renderStub("project/vitest.config.stub"));
+    add("vitest.e2e.config.mts", renderStub("project/vitest-e2e.config.stub"));
   }
   add("src/serve.ts", renderStub("project/serve.stub"));
   add("package.json", packageJson(appName, features, minimal));

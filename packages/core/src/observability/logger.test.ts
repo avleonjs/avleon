@@ -1,7 +1,16 @@
+import {
+  afterAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+  type Mock,
+} from "vitest";
 import { LoggerService, buildLoggerOptions } from "./logger";
 import pino from "pino";
 
-jest.mock("pino");
+vi.mock("pino");
 
 const prettyTransport = {
   target: "pino-pretty",
@@ -12,7 +21,7 @@ const prettyTransport = {
 };
 
 describe("LoggerService constructor", () => {
-  const mockPino = pino as unknown as jest.Mock;
+  const mockPino = pino as unknown as Mock;
   const originalEnv = { ...process.env };
 
   beforeEach(() => {

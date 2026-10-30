@@ -21,18 +21,12 @@
     "strictPropertyInitialization": false,
     "skipLibCheck": true,
 
-    // Node 20 built-ins. Jest types live in tsconfig.test.json only.
-    "types": ["node", "jest"],
+    // Node 20 built-ins. Tests import their APIs from vitest.
+    "types": ["node"],
     "paths": {
       "knex": ["./node_modules/knex/types/index.d.ts"]
     }
   },
   "include": ["src/**/*"],
-  "exclude": [
-    "node_modules",
-    "dist",
-    "**/*.test.ts",
-    "**/*.spec.ts",
-    "src/**/mock-db.ts"
-  ]
+  "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.spec.ts"]
 }

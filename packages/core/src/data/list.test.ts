@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it } from "vitest";
 import { List } from "./collection";
 
 type Todo = {
@@ -124,9 +125,7 @@ describe("List", () => {
     });
 
     it("chains", () => {
-      const result = list
-        .Where((t) => !t.completed)
-        .Where((t) => t.id > 1);
+      const result = list.Where((t) => !t.completed).Where((t) => t.id > 1);
       expect(result.Count()).toBe(1);
     });
   });

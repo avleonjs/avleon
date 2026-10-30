@@ -1,3 +1,4 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import fs from "fs";
 import os from "os";
 import path from "path";
@@ -13,9 +14,9 @@ import { CliError } from "../src/errors";
 
 let tmp: string;
 const quiet = () => {
-  jest.spyOn(console, "log").mockImplementation(() => {});
-  jest.spyOn(console, "warn").mockImplementation(() => {});
-  jest.spyOn(console, "error").mockImplementation(() => {});
+  vi.spyOn(console, "log").mockImplementation(() => {});
+  vi.spyOn(console, "warn").mockImplementation(() => {});
+  vi.spyOn(console, "error").mockImplementation(() => {});
 };
 
 beforeEach(() => {
@@ -24,7 +25,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  jest.restoreAllMocks();
+  vi.restoreAllMocks();
   fs.rmSync(tmp, { recursive: true, force: true });
 });
 
@@ -172,7 +173,9 @@ describe("new", () => {
     expect(pkg.name).toBe("my-api");
     expect(pkg.dependencies["@fastify/cors"]).toBeDefined();
     expect(pkg.scripts["start:dev"]).toBe("avleon serve");
-    expect(() => JSON.parse(read("my_api", "test", "e2e-spec.json"))).not.toThrow();
+    expect(pkg.scripts.test).toBe("vitest run");
+    expect(read("my_api", "vitest.config.mts")).toContain("swc.vite()");
+    expect(exists("my_api", "vitest.e2e.config.mts")).toBe(true);
     expect(read("my_api", "src", "app.ts")).toContain("useCors");
     expect(fs.existsSync(path.join(root, "src", "config", "openapi.config.ts"))).toBe(true);
   });
@@ -181,7 +184,7 @@ describe("new", () => {
     await createApplication("mini", { cwd: tmp, minimal: true, yes: true, skipInstall: true });
     expect(exists("mini", "src", "app.ts")).toBe(true);
     expect(exists("mini", "src", "controllers")).toBe(false);
-    expect(JSON.parse(read("mini", "package.json")).devDependencies.jest).toBeUndefined();
+    expect(JSON.parse(read("mini", "package.json")).devDependencies.vitest).toBeUndefined();
   });
 
   it("refuses a non-empty directory without --force", async () => {

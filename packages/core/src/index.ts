@@ -12,7 +12,6 @@ export * from "./core/application";
 export * from "./core/interfaces";
 export * from "./core/types";
 export * from "./core/testing";
-export * from "./core/mock-db";
 
 // ─── HTTP ────────────────────────────────────────────────────────────────────
 export * from "./http";

@@ -1,4 +1,15 @@
 import "reflect-metadata";
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+  type MockInstance,
+} from "vitest";
 import { Readable } from "stream";
 import {
   Contains,
@@ -147,11 +158,11 @@ async function boot(setup: (app: AvleonApplication) => void) {
 
 describe("request pipeline", () => {
   const savedEnv = process.env.NODE_ENV;
-  let spies: jest.SpyInstance[] = [];
+  let spies: MockInstance[] = [];
 
   beforeEach(() => {
     spies = (["log", "warn", "error"] as const).map((m) =>
-      jest.spyOn(console, m).mockImplementation(() => {}),
+      vi.spyOn(console, m).mockImplementation(() => {}),
     );
   });
 
@@ -213,7 +224,7 @@ describe("request pipeline", () => {
     let app: AvleonApplication;
 
     beforeAll(async () => {
-      jest.spyOn(console, "log").mockImplementation(() => {});
+      vi.spyOn(console, "log").mockImplementation(() => {});
       app = await boot((a) => a.useControllers([OpenController]));
     });
 

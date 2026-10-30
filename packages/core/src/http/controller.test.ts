@@ -1,4 +1,5 @@
 import "reflect-metadata";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   ApiController,
   createControllerDecorator,
@@ -10,12 +11,12 @@ import { Service as TypediService } from "typedi";
 
 describe("Controller Decorators", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe("ApiController", () => {
     it("should apply metadata and Service decorator when used as a class decorator", () => {
-      const registerControllerSpy = jest.spyOn(
+      const registerControllerSpy = vi.spyOn(
         containerModule,
         "registerController",
       );
@@ -43,7 +44,7 @@ describe("Controller Decorators", () => {
     });
 
     it("should apply metadata and Service decorator when used with a path", () => {
-      const registerControllerSpy = jest.spyOn(
+      const registerControllerSpy = vi.spyOn(
         containerModule,
         "registerController",
       );
@@ -71,7 +72,7 @@ describe("Controller Decorators", () => {
     });
 
     it("should apply metadata and Service decorator when used with options", () => {
-      const registerControllerSpy = jest.spyOn(
+      const registerControllerSpy = vi.spyOn(
         containerModule,
         "registerController",
       );

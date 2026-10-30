@@ -1,4 +1,5 @@
 import "reflect-metadata";
+import { afterEach, describe, expect, it, test } from "vitest";
 import Container, { Service } from "typedi";
 import { AvleonApplication } from "../core/application";
 import { AvleonTest } from "../core/testing";
@@ -31,7 +32,10 @@ describe("AvleonAuthentication", () => {
     const handler = new HeaderAuthentication();
     const req = { headers: { "x-token": "valid" } } as unknown as IRequest;
 
-    await expect(handler.authenticate(req)).resolves.toEqual({ id: 1, name: "Tareq" });
+    await expect(handler.authenticate(req)).resolves.toEqual({
+      id: 1,
+      name: "Tareq",
+    });
   });
 
   it("returns null when credentials are absent or wrong", async () => {
@@ -41,7 +45,9 @@ describe("AvleonAuthentication", () => {
       handler.authenticate({ headers: {} } as unknown as IRequest),
     ).resolves.toBeNull();
     await expect(
-      handler.authenticate({ headers: { "x-token": "nope" } } as unknown as IRequest),
+      handler.authenticate({
+        headers: { "x-token": "nope" },
+      } as unknown as IRequest),
     ).resolves.toBeNull();
   });
 });

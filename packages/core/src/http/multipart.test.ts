@@ -1,3 +1,4 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { UploadFileFromRequest } from "./multipart";
 import {
   BadRequestException,
@@ -17,7 +18,7 @@ const mockReq = (fileData: any) =>
     headers: {},
     method: "POST",
     url: "/upload",
-    file: jest.fn().mockResolvedValue(fileData),
+    file: vi.fn().mockResolvedValue(fileData),
   }) as unknown as IRequest;
 
 const upload = (filename: string, content = "data") => ({
