@@ -54,7 +54,6 @@ export const Container: ContainerApi = {
 
 // typedi internals used by reset(). typedi has no exports map, so the marker
 // for "not constructed yet" can be imported from its build.
- 
 const { EMPTY_VALUE } = require("typedi/cjs/empty.const") as {
   EMPTY_VALUE: symbol;
 };
