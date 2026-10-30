@@ -20,10 +20,15 @@
   },
   "devDependencies": {
     "husky": "^9.1.7",
-    "lerna": "^9.0.7",
+    "lerna": "^10.1.1",
     "lint-staged": "^16.1.6"
   },
   "engines": {
     "node": ">=20"
+  },
+  "overrides": {
+    "nx": {
+      "undici": "^7.30.1"
+    }
   }
 }

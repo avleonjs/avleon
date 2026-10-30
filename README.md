@@ -59,7 +59,7 @@ npm install @avleon/core reflect-metadata class-validator class-transformer
 
 ## Working on Avleon
 
-Requirements: Node.js 20 or newer, npm and git.
+Requirements: Node.js 22.22+ or 24.15+ (needed by Lerna 10), npm and git. The published packages still support Node.js 20, and CI tests them on it.
 
 ```bash
 npm run setup       # npm ci at the root (all packages) and in docs
