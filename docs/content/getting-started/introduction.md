@@ -22,5 +22,6 @@ for building REST APIs with minimal boilerplate. It gives you:
 
 Integrations are optional peer dependencies, so you install only what you use.
 
-> **Upgrading from 0.2?** 0.3 changes authorization, validation, pagination,
-> file storage and dependencies. See [Upgrading to 0.3](/getting-started/upgrading).
+> **Upgrading from 0.3?** Database support moved to `@avleon/data`. See
+> [Upgrading to 0.4](/getting-started/upgrading-0.4). Coming from 0.2, read
+> [Upgrading to 0.3](/getting-started/upgrading) first.
