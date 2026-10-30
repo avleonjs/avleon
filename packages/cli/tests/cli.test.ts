@@ -178,6 +178,17 @@ describe("new", () => {
     expect(exists("my_api", "vitest.e2e.config.mts")).toBe(true);
     expect(read("my_api", "src", "app.ts")).toContain("useCors");
     expect(fs.existsSync(path.join(root, "src", "config", "openapi.config.ts"))).toBe(true);
+    expect(pkg.dependencies["@avleon/data"]).toBeUndefined();
+    expect(read("my_api", "avleon-env.d.ts")).not.toContain("reference");
+  });
+
+  it("adds @avleon/data and its types for the database features", async () => {
+    await createApplication("db_api", { cwd: tmp, yes: true, skipInstall: true, features: ["typeorm"] });
+    const pkg = JSON.parse(read("db_api", "package.json"));
+    expect(pkg.dependencies["@avleon/data"]).toBe(pkg.dependencies["@avleon/cli"]);
+    expect(pkg.dependencies.typeorm).toBeDefined();
+    expect(read("db_api", "avleon-env.d.ts")).toContain('/// <reference types="@avleon/data" />');
+    expect(read("db_api", "tsconfig.json")).toContain('"avleon-env.d.ts"');
   });
 
   it("scaffolds a minimal project", async () => {

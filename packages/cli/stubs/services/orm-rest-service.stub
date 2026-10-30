@@ -1,4 +1,5 @@
-import { AppService, InjectRepository } from '@avleon/core';
+import { AppService } from '@avleon/core';
+import { InjectRepository } from '@avleon/data';
 import { Repository } from 'typeorm';
 import { {Model} } from '{modelImport}';
 

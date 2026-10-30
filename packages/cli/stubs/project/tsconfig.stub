@@ -13,6 +13,6 @@
     "sourceMap": true,
     "strict": false
   },
-  "include": ["src/**/*"],
+  "include": ["avleon-env.d.ts", "src/**/*"],
   "exclude": ["node_modules", "dist"]
 }
