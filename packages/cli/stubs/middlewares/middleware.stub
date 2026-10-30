@@ -1,0 +1,9 @@
+import { AppMiddleware, AvleonMiddleware, IRequest, IResponse } from '@avleon/core';
+
+@AppMiddleware
+export class {ClassName} extends AvleonMiddleware {
+  async invoke(req: IRequest, res?: IResponse) {
+    // your logic goes here
+    return req;
+  }
+}

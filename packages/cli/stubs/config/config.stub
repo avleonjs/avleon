@@ -1,0 +1,9 @@
+import { AppConfig, AvleonConfig, Environment } from '@avleon/core';
+
+@AppConfig
+export class {ClassName} extends AvleonConfig {
+  config(env: Environment) {
+    // Return this config's values, e.g. { secret: env.get('JWT_SECRET') }.
+    return {};
+  }
+}

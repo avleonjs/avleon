@@ -1,0 +1,8 @@
+import { Avleon } from '@avleon/core';
+import { HomeController } from './controllers/home.controller';
+{Imports}
+const app = Avleon.createApplication();
+{Setup}
+app.useControllers([HomeController]);
+
+export default app;

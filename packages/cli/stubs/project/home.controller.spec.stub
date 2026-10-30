@@ -1,0 +1,18 @@
+import { AvleonTest } from '@avleon/core';
+import { HomeController } from './home.controller';
+
+describe('HomeController', () => {
+  let controller!: HomeController;
+
+  beforeAll(() => {
+    controller = AvleonTest.getController(HomeController);
+  });
+
+  it('should be defined', () => {
+    expect(controller).toBeDefined();
+  });
+
+  it('should return hello message', () => {
+    expect(controller.sayHello()).toEqual({ message: 'Hello World!' });
+  });
+});

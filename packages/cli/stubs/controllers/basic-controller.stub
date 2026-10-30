@@ -1,9 +1,9 @@
 import { ApiController, Get } from '@avleon/core';
 
-@ApiController('/{controller}s')
-export class {Controller}Controller {
+@ApiController('/{route}')
+export class {ClassName} {
   @Get()
   index() {
-    return '{controller} ok';
+    return { message: '{ClassName} works' };
   }
 }

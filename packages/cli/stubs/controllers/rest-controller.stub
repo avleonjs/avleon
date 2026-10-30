@@ -1,7 +1,7 @@
 import { ApiController, Get, Post, Put, Delete, Param, Query, Body } from '@avleon/core';
 
-@ApiController('/{controller}s')
-export class {Controller}Controller {
+@ApiController('/{route}')
+export class {ClassName} {
   @Get()
   async index(@Query() query?: any) {
     throw new Error('Method not implemented.');

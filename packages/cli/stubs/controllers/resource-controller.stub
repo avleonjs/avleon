@@ -1,0 +1,45 @@
+import { ApiController, Get, Post, Put, Delete, Param, Query, Body, HttpExceptions } from '@avleon/core';
+import { {ServiceClass} } from '{serviceImport}';
+
+@ApiController('/{route}')
+export class {ClassName} {
+  constructor(private readonly {serviceVar}: {ServiceClass}) {}
+
+  @Get()
+  async index(@Query() query?: any) {
+    if (query && query.page) {
+      return this.{serviceVar}.paginate(Number(query.page));
+    }
+    return this.{serviceVar}.findAll();
+  }
+
+  @Get('/:id')
+  async findOne(@Param('id') id: number) {
+    const {modelVar} = await this.{serviceVar}.findByPk(Number(id));
+    if (!{modelVar}) throw HttpExceptions.notFound('{Model} not found.');
+    return {modelVar};
+  }
+
+  @Post()
+  async create(@Body() body: any) {
+    return this.{serviceVar}.create(body);
+  }
+
+  @Put('/:id')
+  async update(@Param('id') id: number, @Body() updateBody: any) {
+    const {modelVar} = await this.{serviceVar}.findByPk(Number(id));
+    if (!{modelVar}) throw HttpExceptions.notFound('{Model} not found.');
+    const isUpdated = await this.{serviceVar}.update(Number(id), updateBody);
+    if (!isUpdated) throw HttpExceptions.internalError("Can't update {Model}");
+    return { message: 'Updated successfully' };
+  }
+
+  @Delete('/:id')
+  async delete(@Param('id') id: number) {
+    const {modelVar} = await this.{serviceVar}.findByPk(Number(id));
+    if (!{modelVar}) throw HttpExceptions.notFound('{Model} not found.');
+    const isDeleted = await this.{serviceVar}.delete(Number(id));
+    if (!isDeleted) throw HttpExceptions.internalError("Can't delete {Model}");
+    return { message: 'Deleted successfully' };
+  }
+}

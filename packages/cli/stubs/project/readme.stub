@@ -1,0 +1,26 @@
+# {AppTitle}
+
+Built with [Avleon](https://github.com/avleonjs/avleon-core).
+
+## Getting Started
+
+```bash
+{InstallCmd}
+{DevCmd}
+```
+
+## Scripts
+
+| Script | Description |
+|--------|-------------|
+| `start:dev` | Start the development server with reload (`avleon serve`) |
+| `build`     | Compile TypeScript to `dist/` (`avleon build`) |
+| `start`     | Run the compiled app in production (`avleon start`) |
+{TestRow}
+## Project Structure
+
+```
+src/
+{Tree}├── app.ts         # App setup
+└── serve.ts       # Entry point
+```
