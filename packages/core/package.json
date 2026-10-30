@@ -40,8 +40,7 @@
     "format": "prettier --write .",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage",
-    "prepare": "husky"
+    "test:coverage": "jest --coverage"
   },
   "dependencies": {
     "dotenv": "^17.3.1",
@@ -177,12 +176,10 @@
     "eslint": "^9.36.0",
     "eslint-config-prettier": "^10.1.8",
     "fastify-socket.io": "^4.0.0",
-    "husky": "^9.1.7",
     "ioredis": "^5.10.1",
     "jest": "^29.7.0",
     "kafkajs": "^2.2.4",
     "knex": "^3.1.0",
-    "lint-staged": "^16.1.6",
     "mssql": "^11.0.0",
     "mysql2": "^3.0.0",
     "pg": "^8.0.0",
@@ -197,12 +194,13 @@
   },
   "lint-staged": {
     "*.{js,mjs,ts,json,md}": "prettier --write",
-    "*.{js,mjs,ts}": "eslint --fix",
-    "*.ts": "jest --bail --findRelatedTests --passWithNoTests"
+    "*.{js,mjs,ts}": "npm exec -w @avleon/core -- eslint --fix",
+    "*.ts": "npm exec -w @avleon/core -- jest --bail --findRelatedTests --passWithNoTests"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/avleonjs/avleon-core"
+    "url": "git+https://github.com/avleonjs/avleon.git",
+    "directory": "packages/core"
   },
   "publishConfig": {
     "access": "public"

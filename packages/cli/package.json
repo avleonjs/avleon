@@ -55,7 +55,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/avleonjs/avleon-cli"
+    "url": "git+https://github.com/avleonjs/avleon.git",
+    "directory": "packages/cli"
   },
   "publishConfig": {
     "access": "public"

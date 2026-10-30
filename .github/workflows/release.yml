@@ -1,5 +1,8 @@
-name: Publish
+name: Release
 
+# `npm run release` (lerna version) bumps every package, commits, and pushes a
+# v* tag. This workflow then publishes each public package whose version is
+# not on npm yet.
 on:
   push:
     tags:
@@ -21,23 +24,26 @@ jobs:
           registry-url: https://registry.npmjs.org
           cache: npm
 
-      - name: Check tag matches package.json version
+      - name: Check tag matches lerna.json version
         run: |
-          PKG_VERSION="v$(node -p "require('./package.json').version")"
-          if [ "$GITHUB_REF_NAME" != "$PKG_VERSION" ]; then
-            echo "::error::Tag $GITHUB_REF_NAME does not match package.json version $PKG_VERSION"
+          LERNA_VERSION="v$(node -p "require('./lerna.json').version")"
+          if [ "$GITHUB_REF_NAME" != "$LERNA_VERSION" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match lerna.json version $LERNA_VERSION"
             exit 1
           fi
 
       - run: npm ci
       - name: Type-check
         run: npm run typecheck
+      - name: Lint
+        run: npm run lint
       - name: Test
         run: npm test
       - name: Build
         run: npm run build
 
       - name: Publish to npm
-        run: npm publish --provenance --access public
+        run: npx lerna publish from-package --yes
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: true
