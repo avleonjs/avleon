@@ -7,7 +7,7 @@ description: Connecting Avleon to a database with TypeORM or Knex.
 
 The `@avleon/data` package adds two database integrations: **TypeORM** for an
 entity/repository model, and **Knex** for a query builder. Install it with the
-library you use and its driver:
+library you use and its driver. It needs `@avleon/core` 0.4 or later.
 
 ::: code-group
 ```sh [TypeORM]
@@ -21,12 +21,20 @@ npm i @avleon/data knex pg
 `@avleon/data` is a [plugin](/advanced/plugins): once it is installed,
 `app.useTypeORM()` and `app.useKnex()` are available, with no import needed. Projects
 created with `avleon new` load its types through the generated
-`avleon-env.d.ts`. In other projects, add that file yourself:
+`avleon-env.d.ts`. In other projects, add that file yourself and include it in
+`tsconfig.json`:
 
 ```ts [avleon-env.d.ts]
 /// <reference types="@avleon/data" />
 ```
 
+```json [tsconfig.json]
+{
+  "include": ["avleon-env.d.ts", "src/**/*"]
+}
+```
+
+Both methods connect before they resolve, so await them before `app.run()`.
 The connection is closed when the app shuts down.
 
 ## TypeORM
@@ -243,6 +251,8 @@ export async function setup() {
 export default app;
 ```
 
+Call `setup()` from `serve.ts` before `app.run()`, as in the TypeORM example.
+
 Inject `KnexDB` to reach the query builder through its `client` property:
 
 ```ts [services/report.service.ts]
@@ -293,3 +303,21 @@ exported.
 
 For prototypes and tests, `Collection` gives the same shape of API over an
 in-memory array — see [Controller](/core-concept/controller) for an example.
+
+## Troubleshooting
+
+| Symptom | Fix |
+|---------|-----|
+| TypeScript: `Property 'useKnex' does not exist` (or `useTypeORM`) | Add `avleon-env.d.ts` and include it in `tsconfig.json`, as shown above. Importing anything from `@avleon/data` in your code has the same effect. |
+| Runtime: `app.useKnex is not a function` | List `@avleon/data` in `package.json` dependencies, use `@avleon/core` 0.4 or later, and start the app from the project root: plugins are found from the `package.json` in the current directory. A bundled app has no `package.json` at runtime; pass the plugin explicitly (below). |
+| `pg is required but not installed` | Install the driver named in `client` (or `type` for TypeORM). |
+| `Knex is not initialized. Call useKnex first.` | A service using `KnexDB` was created before `useKnex` finished. Await `setup()` before `app.run()`. |
+
+To register the plugin yourself, for a bundled app or to turn off discovery:
+
+```ts
+import { Avleon } from '@avleon/core';
+import { dataPlugin } from '@avleon/data';
+
+const app = Avleon.createApplication({ plugins: [dataPlugin] });
+```
